@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - NYOTA Loans</title>
+    <title>Login - IMARISHA BRANCH Loans</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
@@ -204,7 +204,7 @@
     <div class="container">
         <div class="card">
             <div class="logo">
-                <h1>NYOTA</h1>
+                <h1>IMARISHA BRANCH</h1>
                 <p>Login to your account</p>
             </div>
 
@@ -247,7 +247,7 @@
             const password = document.getElementById('password').value;
 
             // Get user data from localStorage
-            const userData = JSON.parse(localStorage.getItem('nyota_user'));
+            const userData = JSON.parse(localStorage.getItem('IMARISHA BRANCH_user'));
 
             if (!userData) {
                 errorMessage.textContent = 'No account found. Please sign up first.';
@@ -257,10 +257,10 @@
 
             // Validate credentials
             if (userData.phone === phone && userData.password === password) {
-                localStorage.setItem('nyota_logged_in', 'true');
+                localStorage.setItem('IMARISHA BRANCH_logged_in', 'true');
 
                 // Check if user has pending application
-                const application = localStorage.getItem('nyota_application');
+                const application = localStorage.getItem('IMARISHA BRANCH_application');
                 if (application) {
                     const appData = JSON.parse(application);
                     if (appData.paymentStatus === 'success') {
