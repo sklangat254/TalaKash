@@ -6,6 +6,12 @@
 const $=id=>document.getElementById(id);
 function read(k){try{return JSON.parse(localStorage.getItem(k)||'null')}catch{return null}}
 const data=read('IMARISHA BRANCH_application')||read('nyota_application')||{};
+// A review page requires a confirmed savings payment. The clock does not activate accounts.
+const validPayment=String(data.paymentStatus||'').toLowerCase();
+if(!(['success','completed'].includes(validPayment) && data.paymentReference && Number(data.savingsAmount??data.amount)>0)){
+  location.replace('savings-plan.html');
+}
+
 const money=v=>v!==undefined&&v!==null&&v!==''&&Number.isFinite(Number(v))?'KES '+Number(v).toLocaleString('en-KE'):'Not recorded';
 const savings=Number(data.savingsAmount??data.amount??0);
 const loan=Number(data.approvedLoanAmount??data.loanAmount??data.proposedLoanLimit??(savings>0?savings*30:0));
