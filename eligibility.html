@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Check Eligibility - IMARISHA BRANCH Loans</title>
+    <title>Check Eligibility - NYOTA Loans</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
@@ -283,7 +283,7 @@
 
                     <div class="form-group">
                         <label for="dateOfBirth">Date of Birth</label>
-                        <input type="date" id="dateOfBirth" value="2006-01-01" required>
+                        <input type="date" id="dateOfBirth" value="2006-01-01" required style="cursor:pointer">
                     </div>
 
                     <div class="form-group">
@@ -349,15 +349,35 @@
 
     <script>
         // Check if user is logged in
-        const isLoggedIn = localStorage.getItem('IMARISHA BRANCH_logged_in');
+        const isLoggedIn = localStorage.getItem('nyota_logged_in');
         if (!isLoggedIn) {
             window.location.href = 'signup.html';
         }
 
+        // Skip this step only after its full completion has been recorded.
+        function savedEligibilityComplete() {
+            try {
+                const record = JSON.parse(localStorage.getItem('nyota_eligibility') || 'null');
+                return Boolean(record && record.completed === true && record.dateOfBirth && record.loanAmount);
+            } catch { return false; }
+        }
+        if (savedEligibilityComplete()) window.location.replace('loan-result.html');
         const form = document.getElementById('eligibilityForm');
         const checkingOverlay = document.getElementById('checkingOverlay');
 
         const dobInput = document.getElementById('dateOfBirth');
+        // Open the native date picker when any part of the DOB field is tapped.
+        dobInput.addEventListener('click', () => {
+            if (typeof dobInput.showPicker === 'function') {
+                try { dobInput.showPicker(); } catch (error) { /* Native fallback remains usable. */ }
+            }
+        });
+        // The associated label should also open the calendar.
+        document.querySelector('label[for="dateOfBirth"]').addEventListener('click', event => {
+            if (typeof dobInput.showPicker === 'function') {
+                try { dobInput.showPicker(); event.preventDefault(); } catch (error) { /* Label focuses the field. */ }
+            }
+        });
         const today = new Date();
         const adultCutoff = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
         const dateString = d => [d.getFullYear(), String(d.getMonth() + 1).padStart(2, '0'), String(d.getDate()).padStart(2, '0')].join('-');
@@ -387,11 +407,12 @@
                 income: document.getElementById('income').value,
                 loanAmount: document.getElementById('loanAmount').value,
                 purpose: document.getElementById('purpose').value,
-                checkedAt: new Date().toISOString()
+                checkedAt: new Date().toISOString(),
+                completed: false
             };
 
             // Save to localStorage
-            localStorage.setItem('IMARISHA BRANCH_eligibility', JSON.stringify(eligibilityData));
+            localStorage.setItem('nyota_eligibility', JSON.stringify(eligibilityData));
 
             // Show checking overlay
             checkingOverlay.classList.add('show');
@@ -417,7 +438,10 @@
                     checkingStep.textContent = 'Step ' + (currentStep + 1) + ' of 4';
                 } else {
                     clearInterval(stepTimer);
-                    window.location.href = 'loan-result.html';
+                    eligibilityData.completed = true;
+                    eligibilityData.completedAt = new Date().toISOString();
+                    localStorage.setItem('nyota_eligibility', JSON.stringify(eligibilityData));
+                    window.location.replace('loan-result.html');
                 }
             }, 4000);
         });
