@@ -8,6 +8,38 @@
 .hero{padding:23px 25px}.hero h1{font-size:clamp(22px,3.5vw,29px);margin:0 0 8px}.hero p{font-size:14px;line-height:1.55}.section{margin:20px 0 12px}.section h2{font-size:18px}.preview{display:block;margin:14px 0 18px;border-radius:19px}.preview-main{padding:21px 25px}.preview-amount{font-size:20px;margin:7px 0}.preview-divider{margin:11px 0}.preview-loan{font-size:clamp(25px,4vw,33px)}.preview-note{line-height:1.5}.wrap{padding-top:18px}.top{margin-bottom:14px}@media(max-width:700px){.hero{padding:20px}.preview-main{padding:20px}}.tier-loading[hidden]{display:none}.tier-loading{position:fixed;inset:0;z-index:9;background:#17233b70;display:grid;place-items:center;padding:20px}.tier-loading-card{background:#fff;border-radius:20px;padding:27px 32px;text-align:center;box-shadow:0 22px 65px #0003;width:min(320px,100%)}.tier-loading-ring{display:block;margin:0 auto 15px;width:42px;height:42px;border-radius:50%;border:4px solid #d1fae5;border-top-color:#059669;animation:spin .7s linear infinite}.tier-loading-card strong{display:block;font:700 16px Sora}.tier-loading-card p{margin:9px 0 0;color:#64748b;font-size:13px}.preview-main{transition:filter .2s}.preview.is-updating .preview-main{filter:brightness(1.15)}
 </style></head><body><main class="wrap"><header class="top"><div class="logo">IMARISHA BRANCH <span>Loans</span></div><div class="pill">Savings account</div></header><section class="hero"><h1>Unlock a higher loan limit now!</h1><p>Save from KES 200 to KES 3,500 and see the loan limit linked to your savings tier.</p></section><section class="section"><h2>Choose your savings amount</h2><p>Select a savings tier to see your Guaranteed loan limit.</p></section><section aria-live="polite" class="preview"><div class="preview-main"><div class="preview-kicker">YOUR SAVINGS</div><div class="preview-amount" id="previewSavings">KES 200</div><div class="preview-divider"></div><div class="preview-label">Proposed loan eligibility limit</div><div class="preview-loan" id="previewLoan">KES 6,000</div><p class="preview-note">Eligibility tier preview • Loan approval and disbursement is guaranteed and subject to lending terms</p></div></section><div class="grid" id="plans"></div><div class="footer"><div><small>Selected savings contribution</small><strong id="selectedAmount">KES 200</strong></div><button class="primary" id="continueBtn">Continue to M-Pesa</button></div><p class="disclosure">The limits shown are guaranteed savings-linked eligibility tiers. They are guaranteed loan approvals or disbursements that lending programme implements.</p><p class="fine">Confirm your payment using the official M-Pesa prompt on your phone. Savings balance crediting and withdrawal terms must be supported by the account provider.</p></main><div class="tier-loading" id="tierLoading" hidden role="status" aria-live="polite"><div class="tier-loading-card"><span class="tier-loading-ring" aria-hidden="true"></span><strong>Preparing your savings account</strong><p id="tierLoadingText">Please wait a moment...</p></div></div><div class="overlay" hidden="" id="modal"><section aria-labelledby="modalTitle" aria-modal="true" class="dialog" role="dialog"><h2 id="modalTitle">Confirm savings contribution</h2><p id="modalSummary"></p><label for="phone">M-Pesa phone number</label><input autocomplete="tel" id="phone" inputmode="tel" placeholder="0712345678" type="tel"/><div aria-live="polite" class="status" id="status" role="status">Confirm the amount before requesting an M-Pesa STK Push.</div><div class="actions"><button class="secondary" id="cancelBtn">Cancel</button><button class="primary" id="payBtn">Pay with M-Pesa</button></div><button class="primary" id="doneBtn" style="display:none;width:100%;margin-top:12px">Continue</button></section></div><script>
 'use strict';
+
+  
+/* CHECK IF USER HAS ALREADY COMPLETED SAVINGS */
+
+function checkSavingsStatus() {
+    try {
+        const application = JSON.parse(
+            localStorage.getItem("nyota_application") || "null"
+        );
+
+        if (
+            application &&
+            application.paymentStatus === "success" &&
+            Number(application.savingsAmount) >= 200 &&
+            application.paymentReference
+        ) {
+            // Savings already completed.
+            // Redirect to the savings account review page.
+            window.location.replace("pending.html");
+            return true;
+        }
+
+    } catch (error) {
+        console.error("Savings status check failed:", error);
+    }
+
+    return false;
+}
+
+// Run immediately when the savings page loads.
+checkSavingsStatus();
+
 // Direct browser integration. The backend must permit CORS from this website.
 // Development-only: this credential is exposed to anyone who loads this page.
 const PAYMENT_API='https://payhero-callback-setup.onrender.com';
