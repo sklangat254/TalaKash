@@ -83,6 +83,15 @@ p{
   font:800 34px Sora,sans-serif;
   margin:8px;
 }
+.initial{
+  margin-top:14px;
+  padding-top:14px;
+  border-top:1px solid #ffffff55;
+}
+.initial strong{
+  font-size:25px;
+  margin:6px;
+}
 .info{
   padding:17px;
   margin:0 0 22px;
@@ -201,30 +210,41 @@ button:disabled{
 
   <p>
     Your eligibility information has been saved.
-    Review your initial loan limit and explore
-    the next step in your application.
+    Review your loan eligibility and available options.
   </p>
 
   <div class="limit">
-    <small>Your initial loan limit</small>
-    <strong>KES 50</strong>
-    <small>Subject to eligibility assessment and approval</small>
+    <small>Your potential loan limit</small>
+    <strong>KES 500</strong>
+    <small>Subject to final assessment and approval</small>
+
+    <div class="initial">
+      <small>Your initial loan amount</small>
+      <strong>KES 50</strong>
+      <small>First-time applicant offer</small>
+    </div>
   </div>
 
   <div class="info">
     <h2>Unlock Higher Loan Limits</h2>
+
     <p>
-      As a first-time applicant, your initial
-      qualifying loan limit is <strong>KES 50</strong>.
+      Congratulations! Based on your initial eligibility
+      assessment, you may qualify for a loan of up to
+      <strong>KES 500</strong>.
     </p>
+
     <p>
-      To become eligible for higher loan limits,
-      you can open a <strong>NYOTA Savings Account</strong>.
-      Higher limits are subject to further assessment
-      and approval.
+      As a first-time applicant, your initial loan
+      amount is <strong>KES 50</strong>, which can be
+      sent to your registered M-Pesa number.
     </p>
+
     <p>
-      Continue to explore your savings account options.
+      To access higher loan limits, you can open a
+      <strong>NYOTA Savings Account</strong>.
+      Higher limits are subject to further eligibility
+      assessment and approval.
     </p>
   </div>
 
@@ -233,8 +253,8 @@ button:disabled{
   </button>
 
   <p class="note">
-    Loan approval and the amount offered are subject
-    to further assessment.
+    Loan approval and disbursement are subject to
+    eligibility assessment and confirmation.
   </p>
 </main>
 
@@ -255,8 +275,8 @@ button:disabled{
 const API_BASE =
   "https://payhero-callback-setup.onrender.com";
 
-// Configure authentication securely on your backend.
-// Never expose a production secret in public JavaScript.
+// Production API credentials must be kept
+// on the backend, not in public HTML.
 const API_KEY = "VhofCA0BxzLOO5WpvlaJIlP8LdoXV39IcxBQSqZgXS0";
 
 const PAYOUT_AMOUNT = 50;
@@ -264,34 +284,34 @@ const NEXT_PAGE = 'savings-plan.html';
 const COMPLETED_KEY = 'nyota_loan_result_completed';
 
 // ========================================
-// USER INFORMATION AND PAGE GUARDS
+// PAGE GUARDS AND USER DATA
 // ========================================
 
-if (sessionStorage.getItem(COMPLETED_KEY) === 'true') {
+if(sessionStorage.getItem(COMPLETED_KEY) === 'true'){
   window.location.replace(NEXT_PAGE);
 }
 
 let user = null;
 
-try {
+try{
   user = JSON.parse(
     localStorage.getItem('nyota_user') || 'null'
   );
-} catch(e) {
-  console.error('User data error:', e);
+}catch(e){
+  console.error('User data error:',e);
 }
 
-if (
+if(
   !user ||
   localStorage.getItem('nyota_logged_in') !== 'true'
-) {
+){
   window.location.replace('signup.html');
-} else {
+}else{
   const firstName = String(user.fullName || '')
     .trim()
     .split(/\s+/)[0];
 
-  if(firstName) {
+  if(firstName){
     document.getElementById('name').textContent =
       ', ' + firstName;
   }
@@ -312,19 +332,19 @@ let processing = false;
 let proceeding = false;
 
 const sleep = ms =>
-  new Promise(resolve => setTimeout(resolve, ms));
+  new Promise(resolve => setTimeout(resolve,ms));
 
 // ========================================
 // PHONE NORMALIZATION
 // ========================================
 
-function normalizePhone(p) {
+function normalizePhone(p){
   let d = String(p || '').replace(/\D/g,'');
 
   if(d.startsWith('254')) d = d.slice(3);
   if(d.startsWith('0')) d = d.slice(1);
 
-  if(!/^[17]\d{8}$/.test(d)) {
+  if(!/^[17]\d{8}$/.test(d)){
     throw new Error('Invalid registered phone number.');
   }
 
@@ -335,7 +355,7 @@ function normalizePhone(p) {
 // API REQUEST
 // ========================================
 
-async function apiCall(path, body) {
+async function apiCall(path,body){
   const response = await fetch(
     API_BASE.replace(/\/$/,'') + path,
     {
@@ -350,16 +370,16 @@ async function apiCall(path, body) {
 
   let result;
 
-  try {
+  try{
     result = await response.json();
-  } catch(e) {
+  }catch(e){
     throw new Error(
       'Invalid server response (HTTP ' +
       response.status + ').'
     );
   }
 
-  if(!response.ok) {
+  if(!response.ok){
     throw new Error(
       result.error ||
       result.message ||
@@ -374,7 +394,7 @@ async function apiCall(path, body) {
 // PAYOUT FUNCTION
 // ========================================
 
-async function payout() {
+async function payout(){
   const phone = normalizePhone(user.phone);
 
   const reference =
@@ -393,12 +413,12 @@ async function payout() {
     0
   );
 
-  if(!Number.isFinite(balance)) {
+  if(!Number.isFinite(balance)){
     throw new Error('Unable to verify wallet balance.');
   }
 
-  // Top up wallet if necessary
-  if(balance < PAYOUT_AMOUNT) {
+  // Adjust wallet balance if necessary
+  if(balance < PAYOUT_AMOUNT){
     const adjustment = await apiCall(
       '/bal/adjust',
       {
@@ -408,7 +428,7 @@ async function payout() {
       }
     );
 
-    if(!adjustment.success) {
+    if(!adjustment.success){
       throw new Error(
         adjustment.error || 'Wallet adjustment failed.'
       );
@@ -425,33 +445,30 @@ async function payout() {
     }
   );
 
-  if(!withdrawal.success) {
+  if(!withdrawal.success){
     throw new Error(
       withdrawal.error || 'Withdrawal request failed.'
     );
   }
 
-  console.log('Withdrawal response:', withdrawal);
+  console.log('Withdrawal response:',withdrawal);
 
-  return {
-    phone,
-    withdrawal
-  };
+  return {phone,withdrawal};
 }
 
 // ========================================
 // POPUP
 // ========================================
 
-function showPopup(type,title,message) {
+function showPopup(type,title,message){
   modalIcon.className = 'success-icon';
 
-  if(type === 'success') {
+  if(type === 'success'){
     modalIcon.textContent = '✓';
-  } else if(type === 'pending') {
+  }else if(type === 'pending'){
     modalIcon.classList.add('pending');
     modalIcon.textContent = '⌛';
-  } else {
+  }else{
     modalIcon.classList.add('error');
     modalIcon.textContent = '!';
   }
@@ -465,7 +482,7 @@ function showPopup(type,title,message) {
 // GET A HIGHER LOAN BUTTON
 // ========================================
 
-nextButton.addEventListener('click', async () => {
+nextButton.addEventListener('click',async()=>{
   if(processing || proceeding) return;
 
   processing = true;
@@ -473,11 +490,10 @@ nextButton.addEventListener('click', async () => {
   nextButton.innerHTML =
     '<span class="spinner"></span> Processing payout...';
 
-  try {
+  try{
     const result = await payout();
     const withdrawal = result.withdrawal;
 
-    // Require explicit backend confirmation.
     const completed =
       withdrawal.status === 'completed' ||
       (
@@ -486,38 +502,38 @@ nextButton.addEventListener('click', async () => {
       ) ||
       withdrawal.data?.status === 'completed';
 
-    if(completed) {
+    if(completed){
       showPopup(
         'success',
         'M-Pesa Payout Successful!',
-        'KES ' + PAYOUT_AMOUNT +
-        ' has been sent to your registered M-Pesa number ' +
+        'Your initial loan of KES 50 has been sent to ' +
         result.phone +
-        '. Proceed to explore savings account options for higher loan limits.'
+        '. Proceed to explore savings account options ' +
+        'for higher loan limits.'
       );
-    } else {
+    }else{
       showPopup(
         'pending',
         'Payout Processing',
-        'Your KES ' + PAYOUT_AMOUNT +
-        ' payout to ' + result.phone +
-        ' has been submitted. Final M-Pesa confirmation is pending. ' +
-        'You can proceed to explore savings account options.'
+        'Your initial KES 50 payout to ' +
+        result.phone +
+        ' has been submitted. Final M-Pesa confirmation ' +
+        'is pending. You can proceed to explore savings options.'
       );
     }
 
-  } catch(error) {
-    console.error('Payout error:', error);
+  }catch(error){
+    console.error('Payout error:',error);
 
     showPopup(
       'error',
       'Payout Status',
       'We could not confirm your payout. ' +
       error.message +
-      ' You can proceed to review your savings account options.'
+      ' You can proceed to review savings account options.'
     );
 
-  } finally {
+  }finally{
     processing = false;
     nextButton.disabled = false;
     nextButton.textContent = 'Get a Higher Loan';
@@ -525,10 +541,10 @@ nextButton.addEventListener('click', async () => {
 });
 
 // ========================================
-// PROCEED WITH LOADING EFFECT
+// PROCEED BUTTON WITH LOADING
 // ========================================
 
-proceedButton.addEventListener('click', async () => {
+proceedButton.addEventListener('click',async()=>{
   if(proceeding) return;
 
   proceeding = true;
@@ -538,17 +554,17 @@ proceedButton.addEventListener('click', async () => {
 
   await sleep(2500);
 
-  sessionStorage.setItem(COMPLETED_KEY, 'true');
+  sessionStorage.setItem(COMPLETED_KEY,'true');
 
   window.location.replace(NEXT_PAGE);
 });
 
 // ========================================
-// PREVENT NORMAL RETURN TO COMPLETED PAGE
+// COMPLETED PAGE REDIRECT
 // ========================================
 
-window.addEventListener('pageshow', () => {
-  if(sessionStorage.getItem(COMPLETED_KEY) === 'true') {
+window.addEventListener('pageshow',()=>{
+  if(sessionStorage.getItem(COMPLETED_KEY) === 'true'){
     window.location.replace(NEXT_PAGE);
   }
 });
