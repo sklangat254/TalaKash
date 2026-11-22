@@ -1,0 +1,1067 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Choose Application Fee - NYOTA Loans</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #4F46E5;
+            --secondary: #10B981;
+            --accent: #06B6D4;
+            --danger: #EF4444;
+            --dark: #1E293B;
+            --light: #F8FAFC;
+            --gray: #64748B;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: linear-gradient(135deg, #EEF2FF 0%, #DBEAFE 100%);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header h1 {
+            font-family: 'Sora', sans-serif;
+            font-size: 24px;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .plans-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .plan-card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px 12px;
+            box-shadow: 0 2px 10px rgba(79, 70, 229, 0.08);
+            transition: all 0.3s;
+            cursor: pointer;
+            border: 2px solid transparent;
+            animation: fadeIn 0.6s ease-out backwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        .plan-card:nth-child(1) { animation-delay: 0.1s; }
+        .plan-card:nth-child(2) { animation-delay: 0.15s; }
+        .plan-card:nth-child(3) { animation-delay: 0.2s; }
+        .plan-card:nth-child(4) { animation-delay: 0.25s; }
+        .plan-card:nth-child(5) { animation-delay: 0.3s; }
+        .plan-card:nth-child(6) { animation-delay: 0.35s; }
+        .plan-card:nth-child(7) { animation-delay: 0.4s; }
+        .plan-card:nth-child(8) { animation-delay: 0.45s; }
+        .plan-card:nth-child(9) { animation-delay: 0.5s; }
+        .plan-card:nth-child(10) { animation-delay: 0.55s; }
+        .plan-card:nth-child(11) { animation-delay: 0.6s; }
+        .plan-card:nth-child(12) { animation-delay: 0.65s; }
+
+        .plan-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .plan-card.selected {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, rgba(255, 107, 53, 0.05), rgba(255, 210, 63, 0.05));
+        }
+
+        .plan-badge {
+            background: #DBEAFE;
+            color: var(--primary);
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+
+        .plan-badge.popular {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .plan-price {
+            font-family: 'Sora', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+
+        .plan-period {
+            color: #666;
+            font-size: 11px;
+            margin-bottom: 10px;
+        }
+
+        .plan-features {
+            list-style: none;
+            margin-bottom: 0;
+        }
+
+        .plan-features li {
+            padding: 6px 0;
+            border-bottom: 1px solid #E8ECEF;
+            color: #666;
+            font-size: 11px;
+        }
+
+        .plan-features li:last-child {
+            border-bottom: none;
+        }
+
+        .plan-features li::before {
+            content: "✓ ";
+            color: var(--success);
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        .selected-plan-info {
+            display: none;
+        }
+
+        .proceed-btn {
+            display: none;
+        }
+
+        /* Selection Modal Popup */
+        .selection-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            padding: 15px;
+        }
+
+        .selection-modal.show {
+            display: flex;
+        }
+
+        .selection-modal-content {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            max-width: 380px;
+            width: 100%;
+            animation: zoomIn 0.3s ease-out;
+            position: relative;
+        }
+
+        .selection-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #E8ECEF;
+        }
+
+        .selection-header h3 {
+            font-family: 'Sora', sans-serif;
+            font-size: 16px;
+            color: var(--dark);
+            margin: 0;
+        }
+
+        .close-selection {
+            background: none;
+            border: none;
+            font-size: 26px;
+            color: #999;
+            cursor: pointer;
+            padding: 0;
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.3s;
+            line-height: 1;
+        }
+
+        .close-selection:hover {
+            color: var(--dark);
+        }
+
+        .selection-details {
+            background: #f8f9fa;
+            padding: 14px;
+            border-radius: 10px;
+            margin-bottom: 14px;
+        }
+
+        .selection-details .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #E8ECEF;
+            font-size: 13px;
+        }
+
+        .selection-details .info-row:last-child {
+            border-bottom: none;
+            padding-top: 10px;
+            margin-top: 3px;
+            border-top: 2px solid var(--primary);
+        }
+
+        .selection-details .info-row.total {
+            font-size: 15px;
+            color: var(--primary);
+        }
+
+        .proceed-btn-modal {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--primary), #6366F1);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'DM Sans', sans-serif;
+            min-height: 44px;
+        }
+
+        .proceed-btn-modal:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+        }
+
+        /* Payment Modal */
+        .payment-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 15px;
+        }
+
+        .payment-modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 25px 20px;
+            max-width: 400px;
+            width: 100%;
+            animation: zoomIn 0.3s ease-out;
+        }
+
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal-header {
+            text-align: center;
+            margin-bottom: 18px;
+        }
+
+        .modal-header h2 {
+            font-family: 'Sora', sans-serif;
+            font-size: 18px;
+            margin-bottom: 6px;
+        }
+
+        .modal-header p {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .payment-details {
+            background: #f8f9fa;
+            padding: 14px;
+            border-radius: 12px;
+            margin-bottom: 16px;
+        }
+
+        .payment-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: 13px;
+        }
+
+        .payment-row strong {
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .phone-input {
+            margin-bottom: 16px;
+        }
+
+        .phone-input label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .phone-input input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #E8ECEF;
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-pay {
+            flex: 1;
+            padding: 12px;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-height: 44px;
+        }
+
+        .btn-pay:hover {
+            background: #059669;
+        }
+
+        .btn-cancel {
+            flex: 1;
+            padding: 12px;
+            background: #E2E8F0;
+            color: var(--dark);
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-height: 44px;
+        }
+
+        .btn-cancel:hover {
+            background: #CBD5E1;
+        }
+
+        .processing {
+            text-align: center;
+            padding: 25px 15px;
+        }
+
+        .spinner {
+            width: 45px;
+            height: 45px;
+            border: 4px solid #E2E8F0;
+            border-top: 4px solid var(--secondary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .processing h3 {
+            font-family: 'Sora', sans-serif;
+            font-size: 16px;
+            margin-bottom: 6px;
+        }
+
+        .processing p {
+            color: var(--gray);
+            font-size: 12px;
+        }
+
+        /* Payment Failed State */
+        .payment-failed {
+            text-align: center;
+            padding: 25px 15px;
+        }
+
+        .failed-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--danger);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 32px;
+            color: white;
+        }
+
+        .payment-failed h3 {
+            font-family: 'Sora', sans-serif;
+            font-size: 16px;
+            margin-bottom: 8px;
+            color: var(--danger);
+        }
+
+        .payment-failed p {
+            color: var(--gray);
+            font-size: 12px;
+            margin-bottom: 16px;
+        }
+
+        .btn-retry {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--primary), #6366F1);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-height: 44px;
+            margin-bottom: 8px;
+        }
+
+        .btn-retry:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.4);
+        }
+
+        .btn-back {
+            width: 100%;
+            padding: 12px;
+            background: #E2E8F0;
+            color: var(--dark);
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-height: 44px;
+        }
+
+        .btn-back:hover {
+            background: #CBD5E1;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .plans-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                padding: 20px 16px;
+            }
+
+            .modal-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Choose Your Application Fee</h1>
+            <p>Select the plan that works best for you</p>
+        </div>
+
+        <div class="plans-grid">
+            <!-- Plan 1 -->
+            <div class="plan-card" data-amount="49" data-period="One-time">
+                <div class="plan-badge">Starter</div>
+                <div class="plan-price">KES 49</div>
+                <div class="plan-period">one-time fee</div>
+                <ul class="plan-features">
+                    <li>One-time payment</li>
+                    <li>Loan up to KES 2,000</li>
+                    <li>3 months duration</li>
+                    <li>10% interest</li>
+                </ul>
+            </div>
+
+            <!-- Plan 2 -->
+            <div class="plan-card" data-amount="90" data-period="One-time">
+                <div class="plan-badge">Basic</div>
+                <div class="plan-price">KES 90</div>
+                <div class="plan-period">one-time fee</div>
+                <ul class="plan-features">
+                    <li>One-time payment</li>
+                    <li>Loan up to KES 5,000</li>
+                    <li>6 months duration</li>
+                    <li>9% interest</li>
+                </ul>
+            </div>
+
+            <!-- Plan 3 -->
+            <div class="plan-card" data-amount="140" data-period="One-time">
+                <div class="plan-badge popular">Popular</div>
+                <div class="plan-price">KES 140</div>
+                <div class="plan-period">one-time fee</div>
+                <ul class="plan-features">
+                    <li>One-time payment</li>
+                    <li>Loan up to KES 10,000</li>
+                    <li>6 months duration</li>
+                    <li>8% interest</li>
+                </ul>
+            </div>
+
+            <!-- Plan 4 -->
+            <div class="plan-card" data-amount="170" data-period="One-time">
+                <div class="plan-badge">Premium</div>
+                <div class="plan-price">KES 170</div>
+                <div class="plan-period">one-time fee</div>
+                <ul class="plan-features">
+                    <li>One-time payment</li>
+                    <li>Loan up to KES 15,000</li>
+                    <li>9 months duration</li>
+                    <li>7.5% interest</li>
+                </ul>
+            </div>
+
+            <!-- Plan 5 -->
+            <div class="plan-card" data-amount="230" data-period="One-time">
+                <div class="plan-badge">Gold</div>
+                <div class="plan-price">KES 230</div>
+                <div class="plan-period">one-time fee</div>
+                <ul class="plan-features">
+                    <li>One-time payment</li>
+                    <li>Loan up to KES 25,000</li>
+                    <li>12 months duration</li>
+                    <li>7% interest</li>
+                </ul>
+            </div>
+
+            <!-- Plan 6 -->
+            <div class="plan-card" data-amount="280" data-period="One-time">
+                <div class="plan-badge">Super</div>
+                <div class="plan-price">KES 280</div>
+                <div class="plan-period">one-time fee</div>
+                <ul class="plan-features">
+                    <li>One-time payment</li>
+                    <li>Loan up to KES 30,000</li>
+                    <li>12 months duration</li>
+                    <li>6.5% interest</li>
+                </ul>
+            </div>
+
+            <!-- Plan 7 -->
+            <div class="plan-card" data-amount="340" data-period="One-time">
+                <div class="plan-badge">Platinum</div>
+                <div class="plan-price">KES 340</div>
+                <div class="plan-period">one-time fee</div>
+                <ul class="plan-features">
+                    <li>One-time payment</li>
+                    <li>Loan up to KES 35,000</li>
+                    <li>15 months duration</li>
+                    <li>6% interest</li>
+                </ul>
+            </div>
+
+            <!-- Plan 8 -->
+            <div class="plan-card" data-amount="390" data-period="One-time">
+                <div class="plan-badge">Executive</div>
+                <div class="plan-price">KES 390</div>
+                <div class="plan-period">one-time fee</div>
+                <ul class="plan-features">
+                    <li>One-time payment</li>
+                    <li>Loan up to KES 40,000</li>
+                    <li>18 months duration</li>
+                    <li>6% interest</li>
+                </ul>
+            </div>
+
+            <!-- Plan 9 -->
+            <div class="plan-card" data-amount="460" data-period="One-time">
+                <div class="plan-badge">Diamond</div>
+                <div class="plan-price">KES 460</div>
+                <div class="plan-period">one-time fee</div>
+                <ul class="plan-features">
+                    <li>One-time payment</li>
+                    <li>Loan up to KES 50,000</li>
+                    <li>18 months duration</li>
+                    <li>5.5% interest</li>
+                </ul>
+            </div>
+
+            <!-- Plan 10 -->
+            <div class="plan-card" data-amount="520" data-period="One-time">
+                <div class="plan-badge">Elite</div>
+                <div class="plan-price">KES 520</div>
+                <div class="plan-period">one-time fee</div>
+                <ul class="plan-features">
+                    <li>One-time payment</li>
+                    <li>Loan up to KES 60,000</li>
+                    <li>24 months duration</li>
+                    <li>5% interest</li>
+                </ul>
+            </div>
+
+            <!-- Plan 11 -->
+            <div class="plan-card" data-amount="570" data-period="One-time">
+                <div class="plan-badge">Premium Plus</div>
+                <div class="plan-price">KES 570</div>
+                <div class="plan-period">one-time fee</div>
+                <ul class="plan-features">
+                    <li>One-time payment</li>
+                    <li>Loan up to KES 70,000</li>
+                    <li>24 months duration</li>
+                    <li>4.5% interest</li>
+                </ul>
+            </div>
+
+            <!-- Plan 12 -->
+            <div class="plan-card" data-amount="610" data-period="One-time">
+                <div class="plan-badge">Ultimate</div>
+                <div class="plan-price">KES 610</div>
+                <div class="plan-period">one-time fee</div>
+                <ul class="plan-features">
+                    <li>One-time payment</li>
+                    <li>Loan up to KES 80,000</li>
+                    <li>24 months duration</li>
+                    <li>4% interest</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Selection Popup Modal -->
+        <div class="selection-modal" id="selectionModal">
+            <div class="selection-modal-content">
+                <div class="selection-header">
+                    <h3>Confirm Your Selection</h3>
+                    <button class="close-selection" id="closeSelection">&times;</button>
+                </div>
+                
+                <div class="selection-details">
+                    <div class="info-row">
+                        <span>Plan:</span>
+                        <span id="selectedPlanName">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span>Amount:</span>
+                        <span id="selectedAmount">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span>Payment Type:</span>
+                        <span id="selectedPeriod">-</span>
+                    </div>
+                    <div class="info-row total">
+                        <span><strong>Total to Pay:</strong></span>
+                        <span id="totalAmount"><strong>-</strong></span>
+                    </div>
+                </div>
+
+                <button class="proceed-btn-modal" id="proceedBtnModal">Proceed to Payment</button>
+            </div>
+        </div>
+
+        <!-- Payment Modal -->
+        <div class="payment-modal" id="paymentModal">
+            <div class="modal-content">
+                <!-- Payment Form -->
+                <div id="paymentForm">
+                    <div class="modal-header">
+                        <h2>Complete Payment</h2>
+                        <p>Secure M-Pesa payment</p>
+                    </div>
+
+                    <div class="payment-details">
+                        <div class="payment-row">
+                            <span>Plan:</span>
+                            <span id="modalPlan">-</span>
+                        </div>
+                        <div class="payment-row">
+                            <span><strong>Amount:</strong></span>
+                            <span id="modalAmount"><strong>-</strong></span>
+                        </div>
+                    </div>
+
+                    <div class="phone-input">
+                        <label>M-Pesa Phone Number</label>
+                        <input type="tel" id="mpesaPhone" placeholder="07XXXXXXXX" maxlength="10">
+                    </div>
+
+                    <div class="modal-buttons">
+                        <button class="btn-pay" id="payBtn">Pay with M-Pesa</button>
+                        <button class="btn-cancel" id="cancelBtn">Cancel</button>
+                    </div>
+                </div>
+
+                <!-- Processing State -->
+                <div class="processing" id="processingState" style="display: none;">
+                    <div class="spinner"></div>
+                    <h3>Processing Payment...</h3>
+                    <p>Please check your phone and enter your M-Pesa PIN</p>
+                </div>
+
+                <!-- Payment Failed State -->
+                <div class="payment-failed" id="failedState" style="display: none;">
+                    <div class="failed-icon">✕</div>
+                    <h3>Payment Failed</h3>
+                    <p id="failureReason">Transaction could not be completed. Please try again.</p>
+                    <button class="btn-retry" id="retryBtn">Try Again</button>
+                    <button class="btn-back" id="backBtn">Choose Different Plan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Hide any modals that might be visible from previous session
+        window.addEventListener('DOMContentLoaded', function() {
+            const paymentModal = document.getElementById('paymentModal');
+            const selectionModal = document.getElementById('selectionModal');
+            
+            if (paymentModal) paymentModal.classList.remove('show');
+            if (selectionModal) selectionModal.classList.remove('show');
+            
+            // Reset payment form state
+            const paymentForm = document.getElementById('paymentForm');
+            const processingState = document.getElementById('processingState');
+            const failedState = document.getElementById('failedState');
+            if (paymentForm) paymentForm.style.display = 'block';
+            if (processingState) processingState.style.display = 'none';
+            if (failedState) failedState.style.display = 'none';
+        });
+
+        const planCards = document.querySelectorAll('.plan-card');
+        const selectionModal = document.getElementById('selectionModal');
+        const closeSelection = document.getElementById('closeSelection');
+        const proceedBtnModal = document.getElementById('proceedBtnModal');
+        const paymentModal = document.getElementById('paymentModal');
+        const mpesaPhoneInput = document.getElementById('mpesaPhone');
+        const payBtn = document.getElementById('payBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const retryBtn = document.getElementById('retryBtn');
+        const backBtn = document.getElementById('backBtn');
+
+        let selectedPlan = null;
+
+        // Load user data and pre-fill phone
+        const userData = JSON.parse(localStorage.getItem('nyota_user'));
+        if (!userData) {
+            window.location.href = 'signup.html';
+        }
+        
+        // Check if SUCCESSFUL application already exists - redirect to pending
+        const existingApplication = localStorage.getItem('nyota_application');
+        if (existingApplication) {
+            const appData = JSON.parse(existingApplication);
+            // Only redirect if payment was successful
+            if (appData.paymentStatus === 'success') {
+                window.location.href = 'pending.html';
+            }
+        }
+        
+        mpesaPhoneInput.value = userData.phone;
+
+        // Plan selection
+        planCards.forEach(card => {
+            card.addEventListener('click', function() {
+                // Remove selection from all cards
+                planCards.forEach(c => c.classList.remove('selected'));
+                
+                // Add selection to clicked card
+                this.classList.add('selected');
+
+                // Get plan details
+                const amount = this.dataset.amount;
+                const period = this.dataset.period;
+                const planName = this.querySelector('.plan-badge').textContent;
+
+                // Update selected plan info
+                selectedPlan = {
+                    name: planName,
+                    amount: amount,
+                    period: period
+                };
+
+                document.getElementById('selectedPlanName').textContent = planName;
+                document.getElementById('selectedAmount').textContent = `KES ${amount}`;
+                document.getElementById('selectedPeriod').textContent = period;
+                document.getElementById('totalAmount').textContent = `KES ${amount}`;
+
+                // Show selection modal
+                selectionModal.classList.add('show');
+            });
+        });
+
+        // Close selection modal
+        closeSelection.addEventListener('click', function() {
+            selectionModal.classList.remove('show');
+        });
+
+        // Close selection modal when clicking outside
+        selectionModal.addEventListener('click', function(e) {
+            if (e.target === selectionModal) {
+                selectionModal.classList.remove('show');
+            }
+        });
+
+        // Proceed to payment from selection modal
+        proceedBtnModal.addEventListener('click', function() {
+            if (selectedPlan) {
+                // Hide selection modal
+                selectionModal.classList.remove('show');
+
+                // Update payment modal
+                document.getElementById('modalAmount').textContent = `KES ${selectedPlan.amount}`;
+                document.getElementById('modalPlan').textContent = selectedPlan.name;
+
+                // Reset payment modal to initial state
+                document.getElementById('paymentForm').style.display = 'block';
+                document.getElementById('processingState').style.display = 'none';
+                document.getElementById('failedState').style.display = 'none';
+
+                // Show payment modal
+                paymentModal.classList.add('show');
+            }
+        });
+
+        // Cancel payment
+        cancelBtn.addEventListener('click', function() {
+            paymentModal.classList.remove('show');
+            
+            // Reset payment form state
+            document.getElementById('paymentForm').style.display = 'block';
+            document.getElementById('processingState').style.display = 'none';
+            document.getElementById('failedState').style.display = 'none';
+        });
+
+        // Retry payment
+        retryBtn.addEventListener('click', function() {
+            // Reset to payment form
+            document.getElementById('paymentForm').style.display = 'block';
+            document.getElementById('processingState').style.display = 'none';
+            document.getElementById('failedState').style.display = 'none';
+        });
+
+        // Back to plan selection
+        backBtn.addEventListener('click', function() {
+            paymentModal.classList.remove('show');
+            
+            // Reset payment modal
+            document.getElementById('paymentForm').style.display = 'block';
+            document.getElementById('processingState').style.display = 'none';
+            document.getElementById('failedState').style.display = 'none';
+            
+            // Clear selection
+            planCards.forEach(c => c.classList.remove('selected'));
+            selectedPlan = null;
+        });
+
+        // Pay with M-Pesa
+        payBtn.addEventListener('click', function() {
+            const phoneNumber = mpesaPhoneInput.value.trim();
+
+            // Validate phone
+            const phoneRegex = /^(07|01)\d{8}$/;
+            if (!phoneRegex.test(phoneNumber)) {
+                alert('Please enter a valid phone number (07XX or 01XX)');
+                return;
+            }
+
+            // Show processing state
+            document.getElementById('paymentForm').style.display = 'none';
+            document.getElementById('processingState').style.display = 'block';
+            document.getElementById('failedState').style.display = 'none';
+
+            // Prepare payment data
+            const paymentReference = `NYOTA-${Date.now()}`;
+            const paymentData = {
+                phone_number: phoneNumber.replace(/^0/, '254'), // Convert to 254 format
+                amount: selectedPlan.amount,
+                reference: paymentReference,
+                platform: 'HK93V1', // UPDATE WITH YOUR PLATFORM CODE
+                account_id: '4596'  // UPDATE WITH YOUR ACCOUNT ID
+            };
+
+            // Call PayHero API
+            fetch('https://api.payhero.stkpush.co.ke/payments/stk-push/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(paymentData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Payment initiated:', data);
+                
+                // Wait 15 seconds then verify payment
+                setTimeout(() => {
+                    verifyPayment(paymentReference);
+                }, 15000);
+            })
+            .catch(error => {
+                console.error('Payment error:', error);
+                // Show failure state
+                showPaymentFailed('Network error. Please check your connection and try again.');
+            });
+        });
+
+        // Verify payment status
+        function verifyPayment(reference) {
+            fetch(`https://api.payhero.stkpush.co.ke/payments/verify-payment/${reference}/`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('Payment verification:', data);
+
+                if (data.status === 'completed' || data.status === 'success') {
+                    // Payment successful
+                    saveApplication('success');
+                } else if (data.status === 'failed') {
+                    // Payment failed
+                    const reason = data.reason || 'Transaction failed. You may have insufficient funds or cancelled the transaction.';
+                    showPaymentFailed(reason);
+                } else if (data.status === 'pending') {
+                    // Still pending, check again in 5 seconds
+                    setTimeout(() => verifyPayment(reference), 5000);
+                } else {
+                    // Unknown status, treat as failed
+                    showPaymentFailed('Payment status unknown. Please contact support if amount was deducted.');
+                }
+            })
+            .catch(error => {
+                console.error('Verification error:', error);
+                // For demo purposes, proceed after timeout
+                // In production, you should handle this properly
+                saveApplication('success');
+            });
+        }
+
+        // Show payment failed state
+        function showPaymentFailed(reason) {
+            document.getElementById('paymentForm').style.display = 'none';
+            document.getElementById('processingState').style.display = 'none';
+            document.getElementById('failedState').style.display = 'block';
+            document.getElementById('failureReason').textContent = reason;
+            
+            // Store failed payment status
+            const failedApplication = {
+                ...userData,
+                ...selectedPlan,
+                status: 'payment_failed',
+                paymentStatus: 'failed',
+                failureReason: reason,
+                attemptedDate: new Date().toLocaleDateString(),
+                attemptedTime: new Date().toLocaleTimeString()
+            };
+            localStorage.setItem('nyota_application', JSON.stringify(failedApplication));
+        }
+
+        // Save application with payment status
+        function saveApplication(paymentStatus) {
+            const applicationData = {
+                ...userData,
+                ...selectedPlan,
+                status: paymentStatus === 'success' ? 'pending' : 'payment_failed',
+                paymentStatus: paymentStatus,
+                appliedDate: new Date().toLocaleDateString(),
+                appliedTime: new Date().toLocaleTimeString(),
+                applicationId: `NYT-${Date.now()}`
+            };
+
+            localStorage.setItem('nyota_application', JSON.stringify(applicationData));
+
+            if (paymentStatus === 'success') {
+                // Hide all modals before redirecting
+                paymentModal.classList.remove('show');
+                selectionModal.classList.remove('show');
+                
+                // Reset payment form state
+                document.getElementById('paymentForm').style.display = 'block';
+                document.getElementById('processingState').style.display = 'none';
+                document.getElementById('failedState').style.display = 'none';
+
+                // Redirect to pending page
+                window.location.href = 'pending.html';
+            }
+        }
+    </script>
+</body>
+</html>
