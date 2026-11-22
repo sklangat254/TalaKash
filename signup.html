@@ -296,6 +296,69 @@
     </div>
 
     <script>
+        
+/* CHECK IF USER HAS ALREADY REGISTERED */
+
+function checkSignupProgress() {
+    try {
+        const user = JSON.parse(
+            localStorage.getItem("IMARISHA BRANCH_user") || "null"
+        );
+
+        const loggedIn = localStorage.getItem(
+            "IMARISHA BRANCH_logged_in"
+        );
+
+        // Only skip signup if registration details exist
+        // and the user is marked as logged in.
+        if (
+            loggedIn === "true" &&
+            user &&
+            user.fullName &&
+            user.phone &&
+            user.idNumber &&
+            user.email
+        ) {
+            const application = JSON.parse(
+                localStorage.getItem("nyota_application") || "null"
+            );
+
+            const eligibility = JSON.parse(
+                localStorage.getItem("nyota_eligibility") || "null"
+            );
+
+            // Savings payment already completed
+            if (
+                application &&
+                application.paymentStatus === "success" &&
+                application.paymentReference
+            ) {
+                window.location.replace("pending.html");
+                return;
+            }
+
+            // Eligibility already completed
+            if (
+                eligibility &&
+                eligibility.checkedAt &&
+                eligibility.loanAmount
+            ) {
+                window.location.replace("loan-result.html");
+                return;
+            }
+
+            // Registration completed, eligibility not yet completed
+            window.location.replace("eligibility.html");
+        }
+
+    } catch (error) {
+        console.error("Signup progress check:", error);
+    }
+}
+
+checkSignupProgress();
+
+        
         const form = document.getElementById('signupForm');
         const submitBtn = document.getElementById('submitBtn');
         const successMessage = document.getElementById('successMessage');
