@@ -27,7 +27,7 @@ function draw(){
     b.className='plan'+(selected===amount?' selected':'');
     b.setAttribute('aria-pressed',String(selected===amount));
     b.innerHTML='<small>Savings tier '+String(i+1).padStart(2,'0')+'</small><strong>'+money(amount)+'</strong><span class="limit">Proposed loan limit: '+money(proposedLoanLimit(amount))+'</span><span class="tag">Select savings tier</span>';
-    b.onclick=()=>{if(busy)return;selected=amount;draw()};
+    b.onclick=()=>{if(busy)return;selected=amount;draw();openDepositModal()};
     plans.appendChild(b);
   });
   const i=amounts.indexOf(selected);
@@ -37,7 +37,8 @@ function draw(){
 
 
 }draw();
-document.getElementById('continueBtn').onclick=()=>{document.getElementById('modalSummary').textContent='Savings deposit: '+money(selected)+'\nProposed loan limit: '+money(proposedLoanLimit(selected))+'.\nConfirm the payment on your phone. Loan approval remains subject to lending terms.';setStatus('Confirm the amount before requesting an M-Pesa STK Push.');modal.hidden=false};
+function openDepositModal(){document.getElementById('modalSummary').textContent='Savings deposit: '+money(selected)+'\nProposed loan limit: '+money(proposedLoanLimit(selected))+'.\nConfirm the payment on your phone. Loan approval remains subject to lending terms.';setStatus('Confirm the amount before requesting an M-Pesa STK Push.');modal.hidden=false;phoneInput.focus()};
+document.getElementById('continueBtn').onclick=openDepositModal;
 cancelBtn.onclick=()=>{if(!busy)modal.hidden=true};
 async function request(path,options={}){const headers={...(options.headers||{})};if(BROWSER_API_TOKEN)headers['X-API-Key']=BROWSER_API_TOKEN;const r=await fetch(PAYMENT_API+path,{...options,headers});const raw=await r.text();let d;try{d=JSON.parse(raw)}catch{throw Error('Unexpected server response (HTTP '+r.status+').')}if(!r.ok)throw Error(d.message||d.error||'HTTP '+r.status);return d}
 function lock(v){busy=v;payBtn.disabled=v;cancelBtn.disabled=v;payBtn.innerHTML=v?'<span class="spinner"></span>Processing...':'Pay with M-Pesa'}
