@@ -2,42 +2,31 @@
 :root{--p:#4f46e5;--g:#059669;--ink:#17233b;--muted:#64748b}*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(circle at 10% 0%,#d8f8ee,transparent 40%),linear-gradient(135deg,#eef2ff,#dbeafe);font-family:'DM Sans',sans-serif;color:var(--ink);display:grid;place-items:center;padding:20px}.card{width:min(100%,480px);background:white;border-radius:24px;padding:32px 26px;box-shadow:0 22px 60px #4f46e522;text-align:center}.brand{font:800 25px Sora,sans-serif;color:var(--p)}.brand span{color:var(--g)}.check{width:72px;height:72px;border-radius:50%;background:#dcfce7;color:#059669;display:grid;place-items:center;margin:24px auto 14px;font-size:36px}.eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--g);text-transform:uppercase}h1{font:700 23px Sora,sans-serif;margin:9px 0}p{color:var(--muted);line-height:1.6;font-size:14px}.limit{margin:24px 0;padding:22px;border-radius:18px;background:linear-gradient(120deg,#4f46e5,#6366f1);color:white;box-shadow:0 10px 25px #4f46e533}.limit small{display:block;opacity:.88}.limit strong{display:block;font:800 34px Sora,sans-serif;margin:8px}.award{background:#ecfdf5;border:1px solid #a7f3d0;border-radius:16px;padding:20px;margin-bottom:22px}.award small{color:#047857}.award strong{display:block;color:#047857;font:800 30px Sora,sans-serif;margin:5px}button{width:100%;border:0;border-radius:12px;background:linear-gradient(110deg,var(--p),#6366f1);padding:16px;color:white;font:700 15px 'DM Sans',sans-serif;cursor:pointer}button:disabled{opacity:.55;cursor:wait}.note{font-size:12px;margin:14px 0 0}.overlay{position:fixed;inset:0;background:#0f172acc;display:none;align-items:center;justify-content:center;padding:20px}.overlay.show{display:flex}.modal{background:white;border-radius:20px;padding:30px 24px;width:min(100%,380px);text-align:center}.modal h2{font:700 19px Sora,sans-serif}.modal p{overflow-wrap:anywhere}.modal button{margin-top:12px}.status{font-size:12px;color:#475569;margin:10px 0}.hidden{display:none}input{width:100%;padding:13px;border:1px solid #cbd5e1;border-radius:10px;margin:10px 0;font-size:16px}
 </style></head><body><main class="card"><div class="brand">NYOTA <span>Loans</span></div><div class="check">✓</div><div class="eyebrow">Application summary</div><h1>Welcome<span id="name"></span>!</h1><p>Explore your available starter offer and the possibility of qualifying for a higher loan after further assessment.</p><div class="limit"><small>Potential loan limit</small><strong>KES 25,000</strong><small>Subject to eligibility assessment</small></div><div class="award"><small>Starter offer</small><strong>KES 50</strong><small>Disbursement to registered M-Pesa number</small></div><button id="claim">Send to M-Pesa</button><p class="note">Your KES 50 starter payout will be requested first. Further lending is subject to approval.</p></main><div class="overlay" id="overlay" role="dialog" aria-modal="true"><div class="modal"><h2 id="modalTitle">Confirm payout</h2><p id="modalText">Authorize the payout to your registered M-Pesa number.</p><div class="status" id="status"></div><button id="close" style="background:#e2e8f0;color:#334155;margin-top:8px">Cancel</button></div></div><script>
 const $=id=>document.getElementById(id);
-let user=null;try{user=JSON.parse(localStorage.getItem('nyota_user')||'null')}catch(e){}
-if(!user||localStorage.getItem('nyota_logged_in')!=='true')location.replace('signup.html');else $('name').textContent=', '+(user.fullName||'').trim().split(/\s+/)[0];
 const API='https://payhero-callback-setup.onrender.com';
+let user=null;
+try{user=JSON.parse(localStorage.getItem('nyota_user')||'null')}catch(e){}
+if(user) $('name').textContent=', '+(user.fullName||'').trim().split(/\s+/)[0];
 const modal=(title,msg)=>{$('modalTitle').textContent=title;$('modalText').textContent=msg;$('overlay').classList.add('show')};
-// Same request fields as the working B4A withdrawal.
-// This endpoint must authenticate the signed-in user server-side and forward
-// to the existing /hb/withdraw handler without exposing BACKEND_API_KEY.
+$('close').onclick=()=>{$('overlay').classList.remove('show')};
 $('claim').onclick=async()=>{
-  const phone=String(user?.phone||'').replace(/\D/g,'');
-  if(!/^(?:0[17]\d{8}|254[17]\d{8})$/.test(phone)){
-    modal('Phone number missing','Please sign in with your registered M-Pesa number.');
-    return;
-  }
+  // Firebase Auth ID token, NOT a backend wallet API key or an editable phone field.
+  const current=window.firebase?.auth?.().currentUser;
+  if(!current){modal('Sign in required','Please sign in with your verified M-Pesa phone number.');return;}
   $('claim').disabled=true;
-  modal('Sending KES 50','Requesting withdrawal to your registered M-Pesa number…');
-  
-  $('close').textContent='Close';
+  modal('Sending KES 50','Requesting withdrawal to your verified M-Pesa number…');
   $('status').textContent='Processing…';
   try{
-    const reference='NYOTA-'+crypto.randomUUID();
-    const response=await fetch(API+'/nyota/withdraw',{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      credentials:'include',
-      body:JSON.stringify({uid:phone,amount:50,reference})
+    const token=await current.getIdToken();
+    const r=await fetch(API+'/nyota/withdraw',{
+      method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body:JSON.stringify({amount:50})
     });
-    const data=await response.json();
-    if(!response.ok||data.success!==true)throw Error(data.message||'Withdrawal not accepted');
-    modal('Withdrawal requested','KES '+(data.payout??50)+' payout accepted for '+user.phone+'. Check your M-Pesa messages for confirmation.');
-    $('status').textContent='Reference: '+reference;
+    const data=await r.json();
+    if(!r.ok||data.success!==true)throw Error(data.message||'Withdrawal not accepted');
+    modal('Withdrawal requested','KES '+data.payout+' payout request accepted. Check M-Pesa for confirmation.');
+    $('status').textContent='';
     $('close').textContent='Get a Higher Loan';
     $('close').onclick=()=>location.assign('savings-plan.html');
-  }catch(error){
-    modal('Withdrawal not completed',error.message);
-    $('status').textContent='Please check your payment status before trying again.';
-    $('claim').disabled=false;
-  }
+  }catch(e){modal('Withdrawal not completed',e.message);$('status').textContent='';$('claim').disabled=false;}
 };
-$('close').onclick=()=>{$('overlay').classList.remove('show')};
 </script></body></html>
