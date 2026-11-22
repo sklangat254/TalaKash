@@ -349,10 +349,47 @@
 
     <script>
         // Check if user is logged in
-        const isLoggedIn = localStorage.getItem('nyota_logged_in');
-        if (!isLoggedIn) {
-            window.location.href = 'signup.html';
+
+/* ELIGIBILITY PAGE - STEP CHECKER */
+
+function checkEligibilityProgress() {
+    try {
+        const eligibility = JSON.parse(
+            localStorage.getItem("nyota_eligibility") || "null"
+        );
+
+        const application = JSON.parse(
+            localStorage.getItem("nyota_application") || "null"
+        );
+
+        // User already completed savings payment
+        if (
+            application &&
+            application.paymentStatus === "success" &&
+            application.paymentReference
+        ) {
+            window.location.replace("pending.html");
+            return;
         }
+
+        // User already completed eligibility
+        if (
+            eligibility &&
+            eligibility.checkedAt &&
+            eligibility.loanAmount
+        ) {
+            window.location.replace("loan-result.html");
+            return;
+        }
+
+        // New users can complete eligibility normally.
+
+    } catch (error) {
+        console.error("Eligibility check error:", error);
+    }
+}
+
+checkEligibilityProgress();
 
         // Skip this step only after its full completion has been recorded.
         function savedEligibilityComplete() {
