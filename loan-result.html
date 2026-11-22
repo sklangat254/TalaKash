@@ -10,8 +10,10 @@ $('claim').onclick=()=>{modal('Confirm your starter payout','Send KES 50 to '+(u
 $('close').onclick=()=>{$('overlay').classList.remove('show')};
 $('confirm').onclick=async()=>{
 
+ if (!user?.phone) { modal('Missing phone number','Please sign in again with your registered M-Pesa number.'); return; }
  $('confirm').disabled=true;$('close').disabled=true;$('status').textContent='Contacting M-Pesa payout service…';modal('Processing payout','Please wait while your request is processed.');
  try{const r=await fetch(API+'/nyota/presentation/payout',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:user.phone})});const d=await r.json();if(!r.ok||!d.success)throw Error(d.message||'Unable to process payout');modal('M-Pesa payout accepted','Your KES 50 payout request was accepted for '+user.phone+'. Please confirm receipt in M-Pesa.');$('status').textContent='Reference: '+d.reference+' · Awaiting delivery confirmation';$('confirm').classList.add('hidden');$('close').textContent='Get a Higher Loan';$('close').disabled=false;$('close').onclick=()=>location.assign('savings-plan.html');
- }catch(e){modal('Payout not confirmed',e.message);$('status').textContent='Please check the payment status before attempting another transfer.';$('confirm').classList.add('hidden');$('close').textContent='Close';$('close').disabled=false;}
+ }catch(e){modal('Payout not confirmed',e.message);$('status').textContent='Check the payment status before retrying.';$('confirm').classList.add('hidden');$('close').textContent='Close';$('close').disabled=false;}
+ finally { $('confirm').disabled=false; }
 };
 </script></body></html>
