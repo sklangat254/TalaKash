@@ -25,7 +25,7 @@ function draw(){
     const b=document.createElement('button');b.type='button';
     b.className='plan'+(selected===amount?' selected':'');
     b.setAttribute('aria-pressed',String(selected===amount));
-    b.innerHTML='<small>Savings tier '+String(i+1).padStart(2,'0')+'</small><strong>'+money(amount)+'</strong><span class="limit">Proposed loan limit: '+money((proposedLoanLimit(amount))*2)+'</span><span class="tag">Select savings tier</span>';
+    b.innerHTML='<small>Savings tier '+String(i+1).padStart(2,'0')+'</small><strong>'+money(amount)+'</strong><span class="limit">Proposed loan limit: '+money((proposedLoanLimit(amount))*3)+'</span><span class="tag">Select savings tier</span>';
     b.onclick=()=>{if(busy)return;selected=amount;draw()};
     plans.appendChild(b);
   });
