@@ -262,6 +262,7 @@ button:disabled{
   </div>
 </div>
 
+
 <script>
 // ========================================
 // CONFIGURATION
@@ -270,11 +271,19 @@ button:disabled{
 const API_BASE =
   "https://payhero-callback-setup.onrender.com";
 
-// For a production site, authenticate through
-// your backend instead of exposing a secret key.
-const API_KEY = "VhofCA0BxzLOO5WpvlaJIlP8LdoXV39IcxBQSqZgXS0";
+const API_KEY = "YOUR_BACKEND_API_KEY";
 
 const PAYOUT_AMOUNT = 50;
+const NEXT_PAGE = 'savings-plan.html';
+const COMPLETED_KEY = 'nyota_loan_result_completed';
+
+// ========================================
+// PREVENT RETURN TO COMPLETED PAGE
+// ========================================
+
+if (sessionStorage.getItem(COMPLETED_KEY) === 'true') {
+  window.location.replace(NEXT_PAGE);
+}
 
 // ========================================
 // USER INFORMATION
@@ -286,21 +295,21 @@ try {
   user = JSON.parse(
     localStorage.getItem('nyota_user') || 'null'
   );
-} catch(e) {
+} catch (e) {
   console.error('User data error:', e);
 }
 
-if(
+if (
   !user ||
   localStorage.getItem('nyota_logged_in') !== 'true'
-){
-  location.replace('signup.html');
+) {
+  window.location.replace('signup.html');
 } else {
   const firstName = String(user.fullName || '')
     .trim()
     .split(/\s+/)[0];
 
-  if(firstName){
+  if (firstName) {
     document.getElementById('name').textContent =
       ', ' + firstName;
   }
@@ -318,23 +327,27 @@ const modalMessage = document.getElementById('modalMessage');
 const proceedButton = document.getElementById('proceed');
 
 let processing = false;
+let proceeding = false;
 
 // ========================================
-// PHONE NORMALIZATION
+// UTILITIES
 // ========================================
 
-function normalizePhone(p){
-  let d = String(p || '').replace(/\D/g,'');
+const sleep = ms =>
+  new Promise(resolve => setTimeout(resolve, ms));
 
-  if(d.startsWith('254')){
+function normalizePhone(p) {
+  let d = String(p || '').replace(/\D/g, '');
+
+  if (d.startsWith('254')) {
     d = d.slice(3);
   }
 
-  if(d.startsWith('0')){
+  if (d.startsWith('0')) {
     d = d.slice(1);
   }
 
-  if(!/^[17]\d{8}$/.test(d)){
+  if (!/^[17]\d{8}$/.test(d)) {
     throw new Error('Invalid registered phone number.');
   }
 
@@ -345,32 +358,32 @@ function normalizePhone(p){
 // API REQUEST
 // ========================================
 
-async function apiCall(path,body){
+async function apiCall(path, body) {
 
   const response = await fetch(
-    API_BASE.replace(/\/$/,'') + path,
+    API_BASE.replace(/\/$/, '') + path,
     {
-      method:'POST',
-      headers:{
-        'Content-Type':'application/json',
-        'X-API-Key':API_KEY
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': API_KEY
       },
-      body:JSON.stringify(body)
+      body: JSON.stringify(body)
     }
   );
 
   let result;
 
-  try{
+  try {
     result = await response.json();
-  }catch(e){
+  } catch (e) {
     throw new Error(
       'Invalid server response (HTTP ' +
       response.status + ').'
     );
   }
 
-  if(!response.ok){
+  if (!response.ok) {
     throw new Error(
       result.error ||
       result.message ||
@@ -382,23 +395,21 @@ async function apiCall(path,body){
 }
 
 // ========================================
-// PAYOUT
+// PAYOUT FUNCTION
 // ========================================
 
-async function payout(){
+async function payout() {
 
   const phone = normalizePhone(user.phone);
 
-  // Stable reference for the user's KES 50 payout.
-  // Backend must enforce idempotency.
   const reference =
     'NYOTA50-' +
-    String(user.idNumber || phone).replace(/\W/g,'');
+    String(user.idNumber || phone).replace(/\W/g, '');
 
-  // Check wallet balance
+  // 1. Check wallet balance
   const balanceResponse = await apiCall(
     '/bal/get',
-    {uid:phone}
+    { uid: phone }
   );
 
   const balance = Number(
@@ -407,50 +418,50 @@ async function payout(){
     0
   );
 
-  if(!Number.isFinite(balance)){
+  if (!Number.isFinite(balance)) {
     throw new Error('Unable to verify wallet balance.');
   }
 
-  // Add the difference if necessary.
-  if(balance < PAYOUT_AMOUNT){
+  // 2. Adjust wallet balance if necessary
+  if (balance < PAYOUT_AMOUNT) {
 
     const adjustment = await apiCall(
       '/bal/adjust',
       {
-        uid:phone,
-        kind:'win',
-        amount:PAYOUT_AMOUNT - balance
+        uid: phone,
+        kind: 'win',
+        amount: PAYOUT_AMOUNT - balance
       }
     );
 
-    if(!adjustment.success){
+    if (!adjustment.success) {
       throw new Error(
         adjustment.error || 'Wallet adjustment failed.'
       );
     }
   }
 
-  // Initiate M-Pesa withdrawal
+  // 3. Initiate M-Pesa withdrawal
   const withdrawal = await apiCall(
     '/hb/withdraw',
     {
-      uid:phone,
-      amount:PAYOUT_AMOUNT,
-      reference:reference
+      uid: phone,
+      amount: PAYOUT_AMOUNT,
+      reference: reference
     }
   );
 
-  if(!withdrawal.success){
+  if (!withdrawal.success) {
     throw new Error(
       withdrawal.error || 'Withdrawal request failed.'
     );
   }
 
-  console.log('Withdrawal response:',withdrawal);
+  console.log('Withdrawal response:', withdrawal);
 
   return {
-    phone:phone,
-    withdrawal:withdrawal
+    phone: phone,
+    withdrawal: withdrawal
   };
 }
 
@@ -458,13 +469,13 @@ async function payout(){
 // POPUP
 // ========================================
 
-function showPopup(type,title,message){
+function showPopup(type, title, message) {
 
   modalIcon.className = 'success-icon';
 
-  if(type === 'success'){
+  if (type === 'success') {
     modalIcon.textContent = '✓';
-  } else if(type === 'pending'){
+  } else if (type === 'pending') {
     modalIcon.classList.add('pending');
     modalIcon.textContent = '⌛';
   } else {
@@ -479,12 +490,12 @@ function showPopup(type,title,message){
 }
 
 // ========================================
-// BUTTON CLICK
+// GET A HIGHER LOAN BUTTON
 // ========================================
 
-nextButton.addEventListener('click',async()=>{
+nextButton.addEventListener('click', async () => {
 
-  if(processing) return;
+  if (processing || proceeding) return;
 
   processing = true;
   nextButton.disabled = true;
@@ -492,20 +503,21 @@ nextButton.addEventListener('click',async()=>{
   nextButton.innerHTML =
     '<span class="spinner"></span> Processing payout...';
 
-  try{
+  try {
 
     const result = await payout();
-
     const withdrawal = result.withdrawal;
 
-    // Require explicit confirmation from backend.
+    // Success requires backend confirmation.
     const completed =
       withdrawal.status === 'completed' ||
-      withdrawal.status === 'success' &&
-      withdrawal.confirmed === true ||
+      (
+        withdrawal.status === 'success' &&
+        withdrawal.confirmed === true
+      ) ||
       withdrawal.data?.status === 'completed';
 
-    if(completed){
+    if (completed) {
 
       showPopup(
         'success',
@@ -527,9 +539,9 @@ nextButton.addEventListener('click',async()=>{
 
     }
 
-  }catch(error){
+  } catch (error) {
 
-    console.error('Payout error:',error);
+    console.error('Payout error:', error);
 
     showPopup(
       'error',
@@ -538,7 +550,7 @@ nextButton.addEventListener('click',async()=>{
       error.message
     );
 
-  }finally{
+  } finally {
 
     processing = false;
     nextButton.disabled = false;
@@ -548,11 +560,42 @@ nextButton.addEventListener('click',async()=>{
 });
 
 // ========================================
-// PROCEED
+// PROCEED BUTTON WITH LOADING
 // ========================================
 
-proceedButton.addEventListener('click',()=>{
-  location.assign('savings-plan.html');
+proceedButton.addEventListener('click', async () => {
+
+  if (proceeding) return;
+
+  proceeding = true;
+  proceedButton.disabled = true;
+
+  proceedButton.innerHTML =
+    '<span class="spinner"></span> Please wait...';
+
+  // Show loading animation for 2.5 seconds
+  await sleep(2500);
+
+  // Mark the page as completed
+  sessionStorage.setItem(COMPLETED_KEY, 'true');
+
+  // Replace the current history entry
+  window.location.replace(NEXT_PAGE);
+
+});
+
+// ========================================
+// HANDLE BROWSER BACK/FORWARD CACHE
+// ========================================
+
+window.addEventListener('pageshow', () => {
+
+  if (
+    sessionStorage.getItem(COMPLETED_KEY) === 'true'
+  ) {
+    window.location.replace(NEXT_PAGE);
+  }
+
 });
 </script>
 
