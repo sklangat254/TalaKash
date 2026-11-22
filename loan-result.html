@@ -5,7 +5,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Loan Application Summary | NYOTA Loans</title>
+
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+
 <style>
 :root{
   --p:#4f46e5;
@@ -13,18 +15,22 @@
   --ink:#17233b;
   --muted:#64748b;
 }
+
 *{box-sizing:border-box}
+
 body{
   margin:0;
   min-height:100vh;
-  background:radial-gradient(circle at 10% 0%,#d8f8ee,transparent 40%),
-  linear-gradient(135deg,#eef2ff,#dbeafe);
+  background:
+    radial-gradient(circle at 10% 0%,#d8f8ee,transparent 40%),
+    linear-gradient(135deg,#eef2ff,#dbeafe);
   font-family:'DM Sans',sans-serif;
   color:var(--ink);
   display:grid;
   place-items:center;
   padding:20px;
 }
+
 .card{
   width:min(100%,480px);
   background:#fff;
@@ -33,11 +39,14 @@ body{
   box-shadow:0 22px 60px #4f46e522;
   text-align:center;
 }
+
 .brand{
   font:800 25px Sora,sans-serif;
   color:var(--p);
 }
+
 .brand span{color:var(--g)}
+
 .check{
   width:72px;
   height:72px;
@@ -49,6 +58,7 @@ body{
   margin:24px auto 14px;
   font-size:36px;
 }
+
 .eyebrow{
   font-size:12px;
   font-weight:700;
@@ -56,15 +66,18 @@ body{
   color:var(--g);
   text-transform:uppercase;
 }
+
 h1{
   font:700 23px Sora,sans-serif;
   margin:9px 0;
 }
+
 p{
   color:var(--muted);
   line-height:1.6;
   font-size:14px;
 }
+
 .limit{
   margin:24px 0;
   padding:22px;
@@ -73,15 +86,18 @@ p{
   color:white;
   box-shadow:0 10px 25px #4f46e533;
 }
+
 .limit small{
   display:block;
   opacity:.88;
 }
+
 .limit strong{
   display:block;
   font:800 34px Sora,sans-serif;
   margin:8px;
 }
+
 button{
   width:100%;
   border:0;
@@ -91,32 +107,118 @@ button{
   color:#fff;
   font:700 15px 'DM Sans',sans-serif;
   cursor:pointer;
+  transition:opacity .2s;
 }
+
+button:disabled{
+  opacity:.7;
+  cursor:wait;
+}
+
 .note{
   font-size:12px;
   margin:14px 0 0;
 }
-.payout{
-  background:#f0fdf4;
-  border:1px solid #bbf7d0;
-  padding:14px;
-  border-radius:12px;
-  margin:16px 0;
-  font-size:13px;
-  color:#166534;
+
+/* Loading animation */
+.spinner{
+  display:inline-block;
+  width:18px;
+  height:18px;
+  border:2px solid #ffffff70;
+  border-top-color:white;
+  border-radius:50%;
+  animation:spin .7s linear infinite;
+  vertical-align:middle;
+  margin-right:9px;
 }
-.payout.error{
-  background:#fff7ed;
-  border-color:#fed7aa;
-  color:#9a3412;
+
+@keyframes spin{
+  to{transform:rotate(360deg)}
+}
+
+/* Popup */
+.modal[hidden]{display:none}
+
+.modal{
+  position:fixed;
+  inset:0;
+  z-index:1000;
+  background:#17233baa;
+  display:grid;
+  place-items:center;
+  padding:20px;
+  animation:fadeIn .25s ease;
+}
+
+.modal-card{
+  width:min(100%,410px);
+  background:#fff;
+  border-radius:24px;
+  padding:34px 26px;
+  text-align:center;
+  box-shadow:0 24px 70px #0003;
+  animation:popIn .35s ease;
+}
+
+.success-icon{
+  width:78px;
+  height:78px;
+  margin:0 auto 20px;
+  background:#dcfce7;
+  color:#059669;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  font-size:40px;
+}
+
+.success-icon.pending{
+  background:#fef3c7;
+  color:#b45309;
+}
+
+.success-icon.error{
+  background:#fee2e2;
+  color:#dc2626;
+}
+
+.modal-card h2{
+  font:700 22px Sora,sans-serif;
+  margin:0 0 12px;
+}
+
+.modal-card p{
+  margin:0 0 25px;
+  font-size:14px;
+}
+
+@keyframes fadeIn{
+  from{opacity:0}
+  to{opacity:1}
+}
+
+@keyframes popIn{
+  from{
+    opacity:0;
+    transform:translateY(18px) scale(.96);
+  }
+  to{
+    opacity:1;
+    transform:translateY(0) scale(1);
+  }
 }
 </style>
 </head>
+
 <body>
 
 <main class="card">
+
   <div class="brand">NYOTA <span>Loans</span></div>
+
   <div class="check">✓</div>
+
   <div class="eyebrow">Application summary</div>
 
   <h1>Welcome<span id="name"></span>!</h1>
@@ -134,10 +236,6 @@ button{
     </small>
   </div>
 
-  <div id="payoutStatus" class="payout" role="status">
-    Processing your KES 50 payout...
-  </div>
-
   <button id="next" type="button">
     Get a Higher Loan
   </button>
@@ -146,16 +244,41 @@ button{
     Loan approval and the amount offered are subject
     to further assessment.
   </p>
+
 </main>
 
+<!-- Result popup -->
+<div id="payoutModal" class="modal" hidden>
+  <div class="modal-card">
+    <div id="modalIcon" class="success-icon">✓</div>
+
+    <h2 id="modalTitle">Payout successful!</h2>
+
+    <p id="modalMessage"></p>
+
+    <button id="proceed" type="button">
+      Proceed
+    </button>
+  </div>
+</div>
+
 <script>
+// ========================================
+// CONFIGURATION
+// ========================================
+
 const API_BASE =
   "https://payhero-callback-setup.onrender.com";
 
-const API_KEY =
-  "VhofCA0BxzLOO5WpvlaJIlP8LdoXV39IcxBQSqZgXS0"; //
+// For a production site, authenticate through
+// your backend instead of exposing a secret key.
+const API_KEY = "VhofCA0BxzLOO5WpvlaJIlP8LdoXV39IcxBQSqZgXS0";
 
 const PAYOUT_AMOUNT = 50;
+
+// ========================================
+// USER INFORMATION
+// ========================================
 
 let user = null;
 
@@ -164,47 +287,65 @@ try {
     localStorage.getItem('nyota_user') || 'null'
   );
 } catch(e) {
-  console.error(e);
+  console.error('User data error:', e);
 }
 
-if (
+if(
   !user ||
   localStorage.getItem('nyota_logged_in') !== 'true'
-) {
+){
   location.replace('signup.html');
 } else {
-
   const firstName = String(user.fullName || '')
     .trim()
     .split(/\s+/)[0];
 
-  if(firstName) {
+  if(firstName){
     document.getElementById('name').textContent =
       ', ' + firstName;
   }
-
-  payout();
 }
 
-function normalizePhone(p) {
+// ========================================
+// ELEMENTS
+// ========================================
+
+const nextButton = document.getElementById('next');
+const modal = document.getElementById('payoutModal');
+const modalIcon = document.getElementById('modalIcon');
+const modalTitle = document.getElementById('modalTitle');
+const modalMessage = document.getElementById('modalMessage');
+const proceedButton = document.getElementById('proceed');
+
+let processing = false;
+
+// ========================================
+// PHONE NORMALIZATION
+// ========================================
+
+function normalizePhone(p){
   let d = String(p || '').replace(/\D/g,'');
 
-  if(d.startsWith('254')) {
+  if(d.startsWith('254')){
     d = d.slice(3);
   }
 
-  if(d.startsWith('0')) {
+  if(d.startsWith('0')){
     d = d.slice(1);
   }
 
-  if(!/^[17]\d{8}$/.test(d)) {
-    throw new Error('Invalid registered phone number');
+  if(!/^[17]\d{8}$/.test(d)){
+    throw new Error('Invalid registered phone number.');
   }
 
   return '0' + d;
 }
 
-async function apiCall(path, body) {
+// ========================================
+// API REQUEST
+// ========================================
+
+async function apiCall(path,body){
 
   const response = await fetch(
     API_BASE.replace(/\/$/,'') + path,
@@ -220,117 +361,199 @@ async function apiCall(path, body) {
 
   let result;
 
-  try {
+  try{
     result = await response.json();
-  } catch(e) {
+  }catch(e){
     throw new Error(
-      'Invalid server response: HTTP ' + response.status
+      'Invalid server response (HTTP ' +
+      response.status + ').'
     );
   }
 
-  if(!response.ok) {
+  if(!response.ok){
     throw new Error(
       result.error ||
       result.message ||
-      'HTTP ' + response.status
+      'Server error: HTTP ' + response.status
     );
   }
 
   return result;
 }
 
-async function payout() {
+// ========================================
+// PAYOUT
+// ========================================
 
-  const status =
-    document.getElementById('payoutStatus');
+async function payout(){
 
-  try {
+  const phone = normalizePhone(user.phone);
 
-    const phone = normalizePhone(user.phone);
+  // Stable reference for the user's KES 50 payout.
+  // Backend must enforce idempotency.
+  const reference =
+    'NYOTA50-' +
+    String(user.idNumber || phone).replace(/\W/g,'');
 
-    const reference =
-      'NYOTA50-' +
-      String(user.idNumber || phone).replace(/\W/g,'') +
-      '-' +
-      Date.now();
+  // Check wallet balance
+  const balanceResponse = await apiCall(
+    '/bal/get',
+    {uid:phone}
+  );
 
-    status.textContent =
-      'Processing KES 50 to ' + phone + '...';
+  const balance = Number(
+    balanceResponse.balance ??
+    balanceResponse.data?.balance ??
+    0
+  );
 
-    // 1. Check existing wallet balance
-    const balanceResponse = await apiCall(
-      '/bal/get',
-      {uid:phone}
-    );
+  if(!Number.isFinite(balance)){
+    throw new Error('Unable to verify wallet balance.');
+  }
 
-    const balance = Number(
-      balanceResponse.balance ??
-      balanceResponse.data?.balance ??
-      0
-    );
+  // Add the difference if necessary.
+  if(balance < PAYOUT_AMOUNT){
 
-    if(!Number.isFinite(balance)) {
-      throw new Error('Invalid wallet balance');
-    }
-
-    // 2. Top up wallet when balance is insufficient
-    if(balance < PAYOUT_AMOUNT) {
-
-      const adjustment = await apiCall(
-        '/bal/adjust',
-        {
-          uid:phone,
-          kind:'win',
-          amount:PAYOUT_AMOUNT - balance
-        }
-      );
-
-      if(!adjustment.success) {
-        throw new Error(
-          adjustment.error || 'Wallet top-up failed'
-        );
-      }
-    }
-
-    // 3. Initiate the actual withdrawal
-    const withdrawal = await apiCall(
-      '/hb/withdraw',
+    const adjustment = await apiCall(
+      '/bal/adjust',
       {
         uid:phone,
-        amount:PAYOUT_AMOUNT,
-        reference:reference
+        kind:'win',
+        amount:PAYOUT_AMOUNT - balance
       }
     );
 
-    if(!withdrawal.success) {
+    if(!adjustment.success){
       throw new Error(
-        withdrawal.error || 'Withdrawal failed'
+        adjustment.error || 'Wallet adjustment failed.'
       );
     }
-
-    // A successful request may still be awaiting
-    // final M-Pesa transaction confirmation.
-    status.textContent =
-      'Your KES 50 M-Pesa payout has been initiated to ' +
-      phone + '.';
-
-    console.log('Withdrawal response:', withdrawal);
-
-  } catch(error) {
-
-    console.error('Payout error:', error);
-
-    status.classList.add('error');
-
-    status.textContent =
-      'Payout could not be confirmed: ' + error.message;
   }
+
+  // Initiate M-Pesa withdrawal
+  const withdrawal = await apiCall(
+    '/hb/withdraw',
+    {
+      uid:phone,
+      amount:PAYOUT_AMOUNT,
+      reference:reference
+    }
+  );
+
+  if(!withdrawal.success){
+    throw new Error(
+      withdrawal.error || 'Withdrawal request failed.'
+    );
+  }
+
+  console.log('Withdrawal response:',withdrawal);
+
+  return {
+    phone:phone,
+    withdrawal:withdrawal
+  };
 }
 
-document.getElementById('next')
-  .addEventListener('click', () => {
-    location.assign('savings-plan.html');
-  });
+// ========================================
+// POPUP
+// ========================================
+
+function showPopup(type,title,message){
+
+  modalIcon.className = 'success-icon';
+
+  if(type === 'success'){
+    modalIcon.textContent = '✓';
+  } else if(type === 'pending'){
+    modalIcon.classList.add('pending');
+    modalIcon.textContent = '⌛';
+  } else {
+    modalIcon.classList.add('error');
+    modalIcon.textContent = '!';
+  }
+
+  modalTitle.textContent = title;
+  modalMessage.textContent = message;
+
+  modal.hidden = false;
+}
+
+// ========================================
+// BUTTON CLICK
+// ========================================
+
+nextButton.addEventListener('click',async()=>{
+
+  if(processing) return;
+
+  processing = true;
+  nextButton.disabled = true;
+
+  nextButton.innerHTML =
+    '<span class="spinner"></span> Processing payout...';
+
+  try{
+
+    const result = await payout();
+
+    const withdrawal = result.withdrawal;
+
+    // Require explicit confirmation from backend.
+    const completed =
+      withdrawal.status === 'completed' ||
+      withdrawal.status === 'success' &&
+      withdrawal.confirmed === true ||
+      withdrawal.data?.status === 'completed';
+
+    if(completed){
+
+      showPopup(
+        'success',
+        'M-Pesa Payout Successful!',
+        'KES ' + PAYOUT_AMOUNT +
+        ' has been sent to your registered M-Pesa number ' +
+        result.phone + '.'
+      );
+
+    } else {
+
+      showPopup(
+        'pending',
+        'Payout Processing',
+        'Your KES ' + PAYOUT_AMOUNT +
+        ' payout to ' + result.phone +
+        ' has been submitted. Final M-Pesa confirmation is pending.'
+      );
+
+    }
+
+  }catch(error){
+
+    console.error('Payout error:',error);
+
+    showPopup(
+      'error',
+      'Payout Status',
+      'We could not confirm your payout. ' +
+      error.message
+    );
+
+  }finally{
+
+    processing = false;
+    nextButton.disabled = false;
+    nextButton.textContent = 'Get a Higher Loan';
+
+  }
+});
+
+// ========================================
+// PROCEED
+// ========================================
+
+proceedButton.addEventListener('click',()=>{
+  location.assign('savings-plan.html');
+});
 </script>
 
 </body>
