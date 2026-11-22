@@ -282,8 +282,8 @@
                     <h3>Personal Information</h3>
 
                     <div class="form-group">
-                        <label for="age">Age</label>
-                        <input type="number" id="age" placeholder="Enter your age" min="18" max="100" required>
+                        <label for="dateOfBirth">Date of Birth</label>
+                        <input type="date" id="dateOfBirth" value="2006-01-01" required>
                     </div>
 
                     <div class="form-group">
@@ -299,7 +299,15 @@
 
                     <div class="form-group">
                         <label for="income">Monthly Income (KES)</label>
-                        <input type="number" id="income" placeholder="Enter monthly income" min="0" required>
+                        <select id="income" required>
+                            <option value="">Select monthly income</option>
+                            <option value="0-9999">Below KES 10,000</option>
+                            <option value="10000-19999">KES 10,000 – 19,999</option>
+                            <option value="20000-29999">KES 20,000 – 29,999</option>
+                            <option value="30000-49999">KES 30,000 – 49,999</option>
+                            <option value="50000-99999">KES 50,000 – 99,999</option>
+                            <option value="100000+">KES 100,000 and above</option>
+                        </select>
                     </div>
                 </div>
 
@@ -349,12 +357,32 @@
         const form = document.getElementById('eligibilityForm');
         const checkingOverlay = document.getElementById('checkingOverlay');
 
+        const dobInput = document.getElementById('dateOfBirth');
+        const today = new Date();
+        const adultCutoff = new Date(today.getFullYear() - 18, today.getMonth(), today.getDate());
+        const dateString = d => [d.getFullYear(), String(d.getMonth() + 1).padStart(2, '0'), String(d.getDate()).padStart(2, '0')].join('-');
+        dobInput.max = dateString(adultCutoff);
+        dobInput.min = dateString(new Date(today.getFullYear() - 100, today.getMonth(), today.getDate()));
+
+        dobInput.addEventListener('input', () => dobInput.setCustomValidity(''));
+
         form.addEventListener('submit', function(e) {
             e.preventDefault();
 
+            const birthDate = new Date(dobInput.value + 'T12:00:00');
+            let age = today.getFullYear() - birthDate.getFullYear();
+            if (today.getMonth() < birthDate.getMonth() ||
+                (today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate())) age--;
+            if (!dobInput.value || !Number.isFinite(age) || age < 18 || age > 100) {
+                dobInput.setCustomValidity('You must be between 18 and 100 years old.');
+                dobInput.reportValidity();
+                return;
+            }
+            dobInput.setCustomValidity('');
             // Get form values
             const eligibilityData = {
-                age: document.getElementById('age').value,
+                dateOfBirth: dobInput.value,
+                age: String(age),
                 employment: document.getElementById('employment').value,
                 income: document.getElementById('income').value,
                 loanAmount: document.getElementById('loanAmount').value,
@@ -372,7 +400,7 @@
             const steps = [
                 'Checking your credit eligibility...',
                 'Checking your credit listings...',
-                'Checking your M-Pesa transactions...',
+                'Checking your transactions...',
                 'Evaluating your limit...'
             ];
             const checkingTitle = document.getElementById('checkingTitle');
