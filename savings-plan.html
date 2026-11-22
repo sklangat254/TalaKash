@@ -45,7 +45,7 @@ async function prepareDepositModal(){
   document.getElementById('tierLoadingText').textContent=money(selected)+' savings • '+money(proposedLoanLimit(selected))+' proposed loan limit';
   document.querySelector('.preview').classList.add('is-updating');
   loading.hidden=false;
-  await new Promise(resolve=>setTimeout(resolve,850));
+  await new Promise(resolve=>setTimeout(resolve,1700));
   loading.hidden=true;
   document.querySelector('.preview').classList.remove('is-updating');
   tierOpening=false;
