@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Loan Application Summary | NYOTA Loans</title>
+<title>Loan Application Summary | IMARISHA BRANCH Loans</title>
 
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
 
@@ -201,7 +201,7 @@ button:disabled{
 <body>
 
 <main class="card">
-  <div class="brand">NYOTA <span>Loans</span></div>
+  <div class="brand">IMARISHA BRANCH <span>Loans</span></div>
   <div class="check">✓</div>
   <div class="eyebrow">Application summary</div>
 
@@ -236,7 +236,7 @@ button:disabled{
 
     <p>
       To access higher loan limits, you can open a
-      <strong>NYOTA Savings Account</strong>.
+      <strong>IMARISHA BRANCH Savings Account</strong>.
       Higher limits are subject to further eligibility
       assessment and approval.
     </p>
@@ -275,7 +275,7 @@ const API_KEY = "VhofCA0BxzLOO5WpvlaJIlP8LdoXV39IcxBQSqZgXS0";
 
 const PAYOUT_AMOUNT = 50;
 const NEXT_PAGE = 'savings-plan.html';
-const COMPLETED_KEY = 'nyota_loan_result_completed';
+const COMPLETED_KEY = 'IMARISHA BRANCH_loan_result_completed';
 
 // ========================================
 // PAGE GUARDS AND USER DATA
@@ -289,7 +289,7 @@ let user = null;
 
 try{
   user = JSON.parse(
-    localStorage.getItem('nyota_user') || 'null'
+    localStorage.getItem('IMARISHA BRANCH_user') || 'null'
   );
 }catch(e){
   console.error('User data error:',e);
@@ -297,7 +297,7 @@ try{
 
 if(
   !user ||
-  localStorage.getItem('nyota_logged_in') !== 'true'
+  localStorage.getItem('IMARISHA BRANCH_logged_in') !== 'true'
 ){
   window.location.replace('signup.html');
 }else{
@@ -392,7 +392,7 @@ async function payout(){
   const phone = normalizePhone(user.phone);
 
   const reference =
-    'NYOTA50-' +
+    'IMARISHA BRANCH50-' +
     String(user.idNumber || phone).replace(/\W/g,'');
 
   // Check wallet balance
