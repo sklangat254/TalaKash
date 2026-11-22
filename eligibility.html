@@ -333,8 +333,9 @@
     <div class="checking-overlay" id="checkingOverlay">
         <div class="checking-modal">
             <div class="spinner"></div>
-            <h3>Checking Eligibility...</h3>
-            <p>Please wait while we verify your information</p>
+            <h3 id="checkingTitle" aria-live="polite">Checking your credit eligibility...</h3>
+            <p id="checkingDescription">Please wait while we prepare your eligibility result.</p>
+            <p id="checkingStep" style="margin-top:12px;font-weight:700;color:var(--primary)" aria-live="polite">Step 1 of 4</p>
         </div>
     </div>
 
@@ -367,11 +368,30 @@
             // Show checking overlay
             checkingOverlay.classList.add('show');
 
-            // Simulate checking (2 seconds)
-            setTimeout(() => {
-                // Always approve for demo
-                window.location.href = 'loan-result.html';
-            }, 2000);
+            // Timed display sequence only; no external credit checks are performed here.
+            const steps = [
+                'Checking your credit eligibility...',
+                'Checking your credit listings...',
+                'Checking your transactions...',
+                'Evaluating your limit...'
+            ];
+            const checkingTitle = document.getElementById('checkingTitle');
+            const checkingStep = document.getElementById('checkingStep');
+            const checkingDescription = document.getElementById('checkingDescription');
+            checkingDescription.textContent = 'Preparing your eligibility result. This page does not access credit bureau or transaction records.';
+            let currentStep = 0;
+            checkingTitle.textContent = steps[currentStep];
+            checkingStep.textContent = 'Step 1 of 4';
+            const stepTimer = setInterval(() => {
+                currentStep++;
+                if (currentStep < steps.length) {
+                    checkingTitle.textContent = steps[currentStep];
+                    checkingStep.textContent = 'Step ' + (currentStep + 1) + ' of 4';
+                } else {
+                    clearInterval(stepTimer);
+                    window.location.href = 'loan-result.html';
+                }
+            }, 4000);
         });
     </script>
 </body>
